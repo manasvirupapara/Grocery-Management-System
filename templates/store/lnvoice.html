@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - The Daily Grocer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .invoice-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .company-info h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .invoice-meta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .invoice-body {
+            padding: 40px;
+        }
+
+        .billing-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .billing-section h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table thead {
+            background: #28a745;
+            color: white;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .totals-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .totals-row.total {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #28a745;
+            border-top: 2px solid #28a745;
+            padding-top: 15px;
+        }
+
+        .invoice-footer {
+            background: #f8f9fa;
+            padding: 25px 40px;
+            text-align: center;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #6c757d;
+            border: 2px solid #6c757d;
+        }
+
+        @media print {
+            .footer-actions { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container" id="invoiceContent">
+        <div class="invoice-header">
+            <div class="header-content">
+                <div class="company-info">
+                    <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>The Daily Grocer</h1>
+                </div>
+            </div>
+                    <p>📍 Abhilasha Sky, OPP Yogeshwar Tenament, Nikol, Ahmedabad, Gujarat 382350</p>
+                    <p>📞 +91 9925185238</p>
+                </div>
+                <div class="invoice-meta">
+                    <h2>INVOICE</h2>
+                    <p><strong>Invoice #:</strong> <span id="invoiceNumber">INV-001</span></p>
+                    <p><strong>Date:</strong> <span id="invoiceDate">24 Feb 2026</span></p>
+                    <p><strong>Order #:</strong> <span id="orderNumber">ORD-001</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="invoice-body">
+            <div class="billing-info">
+                <div class="billing-section">
+                    <h3><i class="fas fa-user"></i> Bill To</h3>
+                    <p><strong id="customerName">Customer Name</strong></p>
+                    <p id="customerAddress">Address</p>
+                    <p><strong>Mobile:</strong> <span id="customerMobile">+91 98765 43210</span></p>
+                </div>
+                <div class="billing-section">
+                    <h3><i class="fas fa-truck"></i> Delivery Details</h3>
+                    <p><strong>Date:</strong> <span id="deliveryDate">24 Feb 2026</span></p>
+                    <p><strong>Payment:</strong> <span id="paymentMethod">Cash on Delivery</span></p>
+                </div>
+            </div>
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody"></tbody>
+            </table>
+
+            <div class="totals-section">
+                <div class="totals-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotalAmount">₹0</span>
+                </div>
+                <div class="totals-row">
+                    <span>Tax (5%):</span>
+                    <span id="taxAmount">₹0</span>
+                </div>
+                <div class="totals-row total">
+                    <span>Total:</span>
+                    <span id="totalAmount">₹0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="invoice-footer">
+            <div class="footer-actions">
+                <button class="btn btn-primary" onclick="downloadPDF()">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+                <button class="btn btn-primary" onclick="printInvoice()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <a href="{% url 'home' %}" class="btn btn-secondary">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+            <p><strong>Thank you for shopping with us!</strong></p>
+        </div>
+    </div>
+
+    <script>
+        // Get order ID from URL - handle both formats
+        const urlParams = new URLSearchParams(window.location.search);
+        let orderId = urlParams.get('orderId');
+        
+        // If not found, try to get from hash
+        if (!orderId && window.location.hash) {
+            orderId = window.location.hash.substring(1);
+        }
+        
+        // If still not found, try to parse from full URL
+        if (!orderId) {
+            const match = window.location.href.match(/orderId=([^&]+)/);
+            if (match) {
+                orderId = decodeURIComponent(match[1]);
+            }
+        }
+        
+        console.log('Extracted Order ID:', orderId);
+        console.log('Full URL:', window.location.href);
+        console.log('Search params:', window.location.search);
+
+        function loadInvoiceData() {
+            console.log('Order ID from URL:', orderId);
+            
+            if (!orderId) {
+                console.error('No order ID in URL');
+                alert('❌ No order ID provided!\n\nRedirecting to home...');
+                setTimeout(() => {
+                    window.location.href = '{% url "home" %}';
+                }, 2000);
+                return;
+            }
+
+            // Fetch invoice data from backend API
+            fetch(`/api/invoice/${encodeURIComponent(orderId)}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        populateInvoice(data.invoice);
+                    } else {
+                        console.error('Error loading invoice:', data.message);
+                        alert('❌ ' + data.message + '\n\nRedirecting to home...');
+                        setTimeout(() => {
+                            window.location.href = '{% url "home" %}';
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching invoice:', error);
+                    alert('❌ Failed to load invoice!\n\nRedirecting to home...');
+                    setTimeout(() => {
+                        window.location.href = '{% url "home" %}';
+                    }, 2000);
+                });
+        }
+
+        function populateInvoice(invoice) {
+            console.log('Populating invoice with data:', invoice);
+            
+            document.getElementById('invoiceNumber').textContent = invoice.invoice_number;
+            document.getElementById('invoiceDate').textContent = new Date(invoice.issue_date).toLocaleDateString('en-IN');
+            document.getElementById('orderNumber').textContent = invoice.order_id;
+            
+            document.getElementById('customerName').textContent = invoice.customer_name || 'Customer';
+            document.getElementById('customerAddress').textContent = invoice.customer_location || 'Address';
+            document.getElementById('customerMobile').textContent = `+91 ${invoice.customer_phone || '0000000000'}`;
+            
+            document.getElementById('deliveryDate').textContent = new Date(invoice.issue_date).toLocaleDateString('en-IN');
+            document.getElementById('paymentMethod').textContent = invoice.payment_method === 'UPI' ? 'UPI Payment' : invoice.payment_method === 'COD' ? 'Cash on Delivery' : 'Card Payment';
+            
+            // Populate items table
+            const tableBody = document.getElementById('itemsTableBody');
+            if (!invoice.items || invoice.items.length === 0) {
+                console.error('No items found!');
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">No items found in order</td></tr>';
+            } else {
+                console.log('Displaying', invoice.items.length, 'items');
+                tableBody.innerHTML = invoice.items.map((item, index) => {
+                    console.log(`Item ${index}:`, item);
+                    return `
+                        <tr>
+                            <td>${item.product_name || 'Unknown Item'}</td>
+                            <td>${item.quantity || 1}</td>
+                            <td>₹${(item.unit_price || 0).toFixed(2)}</td>
+                            <td>₹${(item.line_total || 0).toFixed(2)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            
+            document.getElementById('subtotalAmount').textContent = `₹${(invoice.subtotal || 0).toFixed(2)}`;
+            document.getElementById('taxAmount').textContent = `₹${(invoice.tax_amount || 0).toFixed(2)} (${invoice.tax_name || 'Tax'} ${invoice.tax_percentage || 0}%)`;
+            document.getElementById('totalAmount').textContent = `₹${(invoice.total_amount || 0).toFixed(2)}`;
+            
+            console.log('Invoice populated successfully');
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        function cancelOrder() {
+            // Redirect to cancel order page with order ID
+            window.location.href = `{% url 'cancel_order' %}?orderId=${orderId}`;
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const invoice = document.getElementById('invoiceContent');
+            
+            // Hide buttons before capture
+            document.querySelector('.footer-actions').style.display = 'none';
+            
+            try {
+                const canvas = await html2canvas(invoice, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save(`Invoice-${orderId}.pdf`);
+                
+                alert('✅ PDF downloaded successfully!');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                alert('❌ Error generating PDF. Please try print instead.');
+            } finally {
+                // Show buttons again
+                document.querySelector('.footer-actions').style.display = 'flex';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadInvoiceData);
+    </script>
+</body>
+</html>

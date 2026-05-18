@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Offer{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+.form-page {
+    max-width: 700px;
+    margin: 0 auto;
+}
+.form-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-weight: 500;
+    font-size: 14px;
+}
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+}
+.form-group textarea {
+    resize: vertical;
+}
+.form-group select[multiple] {
+    height: 120px;
+}
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+.form-actions button,
+.form-actions a {
+    flex: 1;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+.form-actions button {
+    background: #2e7d32;
+    color: white;
+}
+.form-actions button:hover {
+    background: #1b5e20;
+}
+.form-actions a {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+.form-actions a:hover {
+    background: #e5e7eb;
+}
+.help-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page form-page">
+    <div class="page-header">
+        <h2><i data-lucide="plus-circle"></i> Add Offer</h2>
+    </div>
+
+    <div class="form-card">
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Offer Name -->
+            <div class="form-group">
+                <label>Offer Name</label>
+                {{ form.name }}
+                <div class="help-text">e.g., Summer Sale, Diwali Discount</div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label>Description</label>
+                {{ form.description }}
+            </div>
+
+            <!-- Discount Type and Value -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Discount Type</label>
+                    {{ form.discount_type }}
+                </div>
+                <div class="form-group">
+                    <label>Discount Value</label>
+                    {{ form.discount_value }}
+                    <div class="help-text">Enter percentage (e.g., 10) or amount (e.g., 50)</div>
+                </div>
+            </div>
+
+            <!-- Date Range -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    {{ form.start_date }}
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    {{ form.end_date }}
+                </div>
+            </div>
+
+            <!-- Products -->
+            <div class="form-group">
+                <label>Apply to Products (Optional)</label>
+                {{ form.products }}
+                <div class="help-text">Hold Ctrl/Cmd to select multiple products. Leave empty for all products.</div>
+            </div>
+
+            <!-- Categories -->
+            <div class="form-group">
+                <label>Apply to Categories (Optional)</label>
+                {{ form.categories }}
+                <div class="help-text">Hold Ctrl/Cmd to select multiple categories. Leave empty for all categories.</div>
+            </div>
+
+            <!-- Active Status -->
+            <div class="form-group">
+                <label>Status</label>
+                {{ form.is_active }}
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-actions">
+                <button type="submit">Save Offer</button>
+                <a href="{% url 'offer_list' %}">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

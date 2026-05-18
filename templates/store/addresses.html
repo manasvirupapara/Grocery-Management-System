@@ -1,0 +1,465 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Addresses - The Daily Grocer</title>
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {background: #f8f9fa;}
+        .addresses-container {max-width: 1000px; margin: 40px auto; padding: 0 20px;}
+        .page-header {background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
+        .page-header h1 {color: #28a745; font-size: 2rem; margin: 0;}
+        .btn {padding: 12px 24px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem;}
+        .btn-primary {background: #28a745; color: white;}
+        .btn-primary:hover {background: #218838; transform: translateY(-2px);}
+        .btn-secondary {background: white; color: #6c757d; border: 2px solid #e9ecef;}
+        .btn-secondary:hover {background: #f8f9fa;}
+        .btn-danger {background: #dc3545; color: white;}
+        .btn-danger:hover {background: #c82333;}
+        .addresses-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;}
+        .address-card {background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s; position: relative;}
+        .address-card:hover {transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.15);}
+        .address-card.default {border: 2px solid #28a745;}
+        .default-badge {position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: 600;}
+        .address-name {font-size: 1.2rem; font-weight: 600; color: #1f2937; margin-bottom: 10px;}
+        .address-details {color: #6c757d; line-height: 1.6; margin-bottom: 15px;}
+        .address-actions {display: flex; gap: 10px; flex-wrap: wrap;}
+        .address-actions button {padding: 8px 16px; font-size: 0.85rem;}
+        .modal {display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); overflow-y: auto;}
+        .modal-content {background: white; margin: 50px auto; padding: 0; border-radius: 20px; max-width: 600px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideDown 0.3s;}
+        @keyframes slideDown {from {transform: translateY(-50px); opacity: 0;} to {transform: translateY(0); opacity: 1;}}
+        .modal-header {background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 25px 30px; border-radius: 20px 20px 0 0; position: relative; display: flex; justify-content: center; align-items: center;}
+        .modal-header h2 {margin: 0; font-size: 1.5rem;}
+        .modal-body {padding: 30px;}
+        .form-group {margin-bottom: 20px;}
+        .form-group label {display: block; margin-bottom: 8px; color: #1f2937; font-weight: 600; font-size: 0.9rem;}
+        .form-group input, .form-group textarea {width: 100%; padding: 12px 15px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 0.95rem; transition: all 0.3s; font-family: 'Poppins', sans-serif; box-sizing: border-box;}
+        .form-group input:focus, .form-group textarea:focus {outline: none; border-color: #28a745;}
+        .form-group textarea {resize: vertical; min-height: 100px;}
+        .form-row {display: grid; grid-template-columns: 1fr 1fr; gap: 20px;}
+        .form-row .form-group {margin-bottom: 0;}
+        .checkbox-group {display: flex; align-items: center; gap: 10px;}
+        .checkbox-group input[type="checkbox"] {width: auto; margin: 0;}
+        .modal-footer {padding: 20px 30px; border-top: 1px solid #e9ecef; display: flex; justify-content: flex-end; gap: 10px;}
+        .close {position: absolute; right: 30px; top: 50%; transform: translateY(-50%); color: white; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;}
+        .close:hover {opacity: 0.8;}
+        .empty-state {text-align: center; padding: 60px 20px; background: white; border-radius: 15px;}
+        .empty-state i {font-size: 4rem; color: #e9ecef; margin-bottom: 20px;}
+        .empty-state h3 {color: #6c757d; margin-bottom: 10px;}
+        .empty-state p {color: #adb5bd; margin-bottom: 25px;}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-main">
+            <div class="container">
+                <div class="header-content" style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+                    <div class="logo" style="cursor: pointer; flex-shrink: 0;" onclick="window.location.href='{% url 'home' %}'">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="logo-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="logo-text">
+                                <h1 style="white-space: nowrap;">The Daily Grocer</h1>
+                                <span>Premium Grocery Store</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="main-nav" style="flex-shrink: 0;">
+                        <ul>
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'shop' %}">Shop</a></li>
+                            <li><a href="{% url 'about' %}">About</a></li>
+                            <li><a href="{% url 'contact' %}">Contact</a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="navbar-search" style="flex: 1; max-width: 400px;">
+                        <input type="text" id="navbarSearchBox" placeholder="Search for products..." onkeypress="handleNavbarSearch(event)">
+                        <button class="navbar-search-btn" onclick="performNavbarSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="header-actions" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
+                        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </div>
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-icon" onclick="toggleUserDropdown()">
+                                <img id="navbarProfilePic" src="" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #28a745;">
+                                <i class="fas fa-user" id="navbarUserIcon"></i>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <div class="user-info" id="userInfo"></div>
+                                <ul class="user-menu-list" id="userMenuList"></ul>
+                            </div>
+                        </div>
+                        <div class="wishlist-icon" onclick="window.location.href='{% url 'wishlist' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-heart"></i>
+                            <span class="count" id="wishlistCount">0</span>
+                        </div>
+                        <div class="cart-icon" onclick="window.location.href='{% url 'cart' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="count" id="cartCount">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="addresses-container">
+        <div class="page-header">
+            <h1><i class="fas fa-map-marker-alt"></i> My Addresses</h1>
+            <button class="btn btn-primary" onclick="openAddressModal()">
+                <i class="fas fa-plus"></i> Add New Address
+            </button>
+        </div>
+
+        <div class="addresses-grid" id="addressesGrid"></div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-map-marker-alt"></i>
+            <h3>No Addresses Saved</h3>
+            <p>Add your delivery addresses for faster checkout</p>
+            <button class="btn btn-primary" onclick="openAddressModal()">
+                <i class="fas fa-plus"></i> Add Address
+            </button>
+        </div>
+    </div>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Address</h2>
+                <span class="close" onclick="closeAddressModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addressForm">
+                    <input type="hidden" id="addressId">
+                    <div class="form-group">
+                        <label for="addressName">Address Label *</label>
+                        <input type="text" id="addressName" placeholder="e.g., Home, Office, etc." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number *</label>
+                        <input type="tel" id="mobile" placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address *</label>
+                        <textarea id="address" placeholder="House No., Building Name, Street" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="landmark">Landmark</label>
+                        <input type="text" id="landmark" placeholder="Nearby landmark">
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode *</label>
+                        <input type="text" id="pincode" placeholder="6-digit pincode" pattern="[0-9]{6}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="city" placeholder="Enter city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State *</label>
+                        <input type="text" id="state" placeholder="Enter state" required>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="isDefault">
+                        <label for="isDefault" style="margin: 0;">Set as default address</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeAddressModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveAddress()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'store/js/script.js' %}"></script>
+    <script src="{% static 'store/js/radhi.js' %}"></script>
+    <script src="{% static 'store/js/form-validation.js' %}"></script>
+    <script>
+        let addresses = [];
+        let editingAddressId = null;
+
+        function loadAddresses() {
+            // Load from localStorage
+            addresses = JSON.parse(localStorage.getItem('radhi-addresses') || '[]');
+            
+            // Check if user has registration address and no saved addresses
+            if (addresses.length === 0) {
+                // Try to get user data from sessionStorage first, then localStorage
+                let userDataString = sessionStorage.getItem('radhi-user');
+                if (!userDataString) {
+                    userDataString = localStorage.getItem('radhi-user');
+                }
+                
+                if (userDataString) {
+                    const user = JSON.parse(userDataString);
+                    if (user && user.loggedIn && user.address) {
+                        // Create default address from user registration data
+                        const userAddress = {
+                            id: 'user-default-' + Date.now(),
+                            name: 'Home Address',
+                            fullName: user.name || '',
+                            mobile: user.mobile || '',
+                            address: user.address || '',
+                            landmark: '',
+                            pincode: user.pincode || '',
+                            city: user.city || '',
+                            state: '',
+                            isDefault: true
+                        };
+                        addresses.push(userAddress);
+                        localStorage.setItem('radhi-addresses', JSON.stringify(addresses));
+                    }
+                }
+            }
+            
+            renderAddresses();
+        }
+
+        function renderAddresses() {
+            const grid = document.getElementById('addressesGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (addresses.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            grid.innerHTML = addresses.map(addr => `
+                <div class="address-card ${addr.isDefault ? 'default' : ''}">
+                    ${addr.isDefault ? '<span class="default-badge"><i class="fas fa-check"></i> Default</span>' : ''}
+                    <div class="address-name">${addr.name}</div>
+                    <div class="address-details">
+                        <strong>${addr.fullName}</strong><br>
+                        ${addr.address}<br>
+                        ${addr.landmark ? addr.landmark + '<br>' : ''}
+                        ${addr.city}, ${addr.state} - ${addr.pincode}<br>
+                        <strong>Mobile:</strong> +91 ${addr.mobile}
+                    </div>
+                    <div class="address-actions">
+                        <button class="btn btn-primary" onclick="editAddress('${addr.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        ${!addr.isDefault ? `<button class="btn btn-secondary" onclick="setDefaultAddress('${addr.id}')">
+                            <i class="fas fa-check"></i> Set Default
+                        </button>` : ''}
+                        <button class="btn btn-danger" onclick="deleteAddress('${addr.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAddressModal(addressId = null) {
+            const modal = document.getElementById('addressModal');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            if (addressId) {
+                editingAddressId = addressId;
+                const address = addresses.find(a => a.id === addressId);
+                modalTitle.textContent = 'Edit Address';
+                document.getElementById('addressId').value = address.id;
+                document.getElementById('addressName').value = address.name;
+                document.getElementById('fullName').value = address.fullName;
+                document.getElementById('mobile').value = address.mobile;
+                document.getElementById('address').value = address.address;
+                document.getElementById('landmark').value = address.landmark || '';
+                document.getElementById('pincode').value = address.pincode;
+                document.getElementById('city').value = address.city;
+                document.getElementById('state').value = address.state;
+                document.getElementById('isDefault').checked = address.isDefault;
+            } else {
+                editingAddressId = null;
+                modalTitle.textContent = 'Add New Address';
+                document.getElementById('addressForm').reset();
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeAddressModal() {
+            document.getElementById('addressModal').style.display = 'none';
+            document.getElementById('addressForm').reset();
+            editingAddressId = null;
+        }
+
+        function saveAddress() {
+            const form = document.getElementById('addressForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const addressData = {
+                id: editingAddressId || Date.now().toString(),
+                name: document.getElementById('addressName').value.trim(),
+                fullName: document.getElementById('fullName').value.trim(),
+                mobile: document.getElementById('mobile').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                landmark: document.getElementById('landmark').value.trim(),
+                pincode: document.getElementById('pincode').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                state: document.getElementById('state').value.trim(),
+                isDefault: document.getElementById('isDefault').checked
+            };
+
+            if (addressData.isDefault) {
+                addresses.forEach(addr => addr.isDefault = false);
+            }
+
+            if (editingAddressId) {
+                const index = addresses.findIndex(a => a.id === editingAddressId);
+                addresses[index] = addressData;
+            } else {
+                if (addresses.length === 0) {
+                    addressData.isDefault = true;
+                }
+                addresses.push(addressData);
+            }
+
+            localStorage.setItem('radhi-addresses', JSON.stringify(addresses));
+            closeAddressModal();
+            loadAddresses();
+        }
+
+        function editAddress(id) {
+            openAddressModal(id);
+        }
+
+        function setDefaultAddress(id) {
+            addresses.forEach(addr => addr.isDefault = (addr.id === id));
+            localStorage.setItem('radhi-addresses', JSON.stringify(addresses));
+            loadAddresses();
+        }
+
+        function deleteAddress(id) {
+            if (confirm('Are you sure you want to delete this address?')) {
+                addresses = addresses.filter(addr => addr.id !== id);
+                if (addresses.length > 0 && !addresses.some(a => a.isDefault)) {
+                    addresses[0].isDefault = true;
+                }
+                localStorage.setItem('radhi-addresses', JSON.stringify(addresses));
+                loadAddresses();
+            }
+        }
+
+        function handleNavbarSearch(event) {
+            if (event.key === 'Enter') performNavbarSearch();
+        }
+
+        function performNavbarSearch() {
+            const searchInput = document.getElementById('navbarSearchBox');
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) window.location.href = `{% url 'shop' %}?search=${encodeURIComponent(searchTerm)}`;
+        }
+
+        function loadUserProfile() {
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || localStorage.getItem('radhi-user') || '{}');
+            const userInfo = document.getElementById('userInfo');
+            const userMenuList = document.getElementById('userMenuList');
+            const navbarProfilePic = document.getElementById('navbarProfilePic');
+            const navbarUserIcon = document.getElementById('navbarUserIcon');
+            
+            if (user.loggedIn) {
+                const firstLetter = (user.name || 'U').charAt(0).toUpperCase();
+                const canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#28a745';
+                ctx.fillRect(0, 0, 100, 100);
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 50px Poppins, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(firstLetter, 50, 50);
+                
+                navbarProfilePic.src = canvas.toDataURL();
+                navbarProfilePic.style.display = 'block';
+                navbarUserIcon.style.display = 'none';
+                
+                userInfo.innerHTML = `<div class="user-greeting">Hello!</div><div class="user-name">${user.name || 'User'}</div><div class="user-email">${user.email || ''}</div>`;
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                    <li><a href="{% url 'orders' %}"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                    <li><a href="{% url 'addresses' %}"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                    <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                `;
+            } else {
+                navbarProfilePic.style.display = 'none';
+                navbarUserIcon.style.display = 'block';
+                userInfo.innerHTML = `<div class="user-greeting">Welcome!</div><div class="user-name">Guest User</div>`;
+                userMenuList.innerHTML = `<li><a href="{% url 'auth' %}"><i class="fas fa-sign-in-alt"></i> Login / Register</a></li>`;
+            }
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        function updateCounts() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('radhi-cart') || '[]');
+                const wishlist = JSON.parse(localStorage.getItem('radhi-wishlist') || '[]');
+                const cartTotal = cart.reduce((sum, item) => sum + (parseInt(item.quantity || item.qty || 0) || 0), 0);
+                document.getElementById('cartCount').textContent = cartTotal;
+                document.getElementById('wishlistCount').textContent = wishlist.length;
+            } catch (e) {
+                document.getElementById('cartCount').textContent = '0';
+                document.getElementById('wishlistCount').textContent = '0';
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('addressModal');
+            if (event.target === modal) {
+                closeAddressModal();
+            }
+            if (!event.target.matches('.user-icon') && !event.target.matches('#navbarUserIcon') && !event.target.matches('#navbarProfilePic')) {
+                const dropdown = document.getElementById('userDropdown');
+                if (dropdown) dropdown.classList.remove('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserProfile();
+            updateCounts();
+            loadAddresses();
+        });
+    </script>
+</body>
+</html>

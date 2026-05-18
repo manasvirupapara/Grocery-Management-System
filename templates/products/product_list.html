@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products Management{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+.track-card-body img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: #f9fafb;
+    padding: 8px;
+}
+.product-actions {
+    display: flex;
+    gap: 8px;
+}
+.product-actions a {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 13px;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    background: #fff;
+}
+.product-actions a:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+}
+.product-price {
+    color: #2e7d32;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 8px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page">
+    <div class="page-header">
+        <h2><i data-lucide="package"></i> Products Management</h2>
+        <a href="{% url 'add_product' %}" class="btn-track" style="margin-left: auto;">+ Add Product</a>
+    </div>
+
+    <div class="delivery-filters">
+        <form action="{% url 'product_list' %}" method="get" class="filter-form">
+            <input type="text" name="search" placeholder="Search products..." value="{{ search }}">
+            <select name="category">
+                <option value="all">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if category_filter == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <select name="subcategory">
+                <option value="all">All Sub Categories</option>
+                {% for subcat in subcategories %}
+                    <option value="{{ subcat.id }}" {% if subcategory_filter == subcat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ subcat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <select name="status">
+                <option value="">All Status</option>
+                <option value="in_stock" {% if status_filter == 'in_stock' %}selected{% endif %}>In Stock</option>
+                <option value="out_of_stock" {% if status_filter == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+                <option value="low_stock" {% if status_filter == 'low_stock' %}selected{% endif %}>Low Stock</option>
+            </select>
+            <button type="submit" class="btn-track">Search</button>
+        </form>
+    </div>
+
+    <div class="track-order-cards">
+        {% for product in page_obj %}
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id">{{ product.name }}</span>
+                {% if product.active_stock > 10 %}
+                    <span class="delivery-badge" style="background: #e8f5e9; color: #2e7d32;">In Stock</span>
+                {% elif product.active_stock > 0 %}
+                    <span class="delivery-badge" style="background: #fff4e5; color: #f57c00;">Low Stock</span>
+                {% else %}
+                    <span class="delivery-badge" style="background: #ffebee; color: #c62828;">No Batches</span>
+                {% endif %}
+            </div>
+            <div class="track-card-body">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% elif product.images.first %}
+                    <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <div style="width: 100%; height: 150px; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #9ca3af; margin-bottom: 12px;">
+                        <i data-lucide="image"></i>
+                    </div>
+                {% endif %}
+                <p><strong>{{ product.name }}</strong></p>
+                <p style="font-size: 13px; color: #6b7280; margin: 4px 0;">{{ product.category.name|default:"Uncategorized" }}</p>
+                
+                <!-- Variants Count -->
+                {% with variant_count=product.variants.count %}
+                {% if variant_count > 0 %}
+                <p style="font-size: 12px; color: #2563eb; margin: 4px 0; font-weight: 600;">
+                    <i data-lucide="layers" style="width: 14px; height: 14px;"></i> {{ variant_count }} variant{{ variant_count|pluralize }}
+                </p>
+                {% else %}
+                <p style="font-size: 12px; color: #9ca3af; margin: 4px 0;">
+                    No variants
+                </p>
+                {% endif %}
+                {% endwith %}
+                
+                <!-- Total Stock from Batches -->
+                {% if product.active_batch_count > 0 %}
+                    <p style="font-size: 12px; color: #059669; margin: 4px 0; font-weight: 600;">
+                        <i data-lucide="package" style="width: 14px; height: 14px;"></i> {{ product.active_batch_count }} batch{{ product.active_batch_count|pluralize:"es" }}
+                    </p>
+                {% else %}
+                    <p style="font-size: 12px; color: #dc2626; margin: 4px 0; font-weight: 600;">
+                        <i data-lucide="alert-circle" style="width: 14px; height: 14px;"></i> No batches
+                    </p>
+                {% endif %}
+                
+                <p class="product-price">₹{{ product.selling_price }}</p>
+            </div>
+            <div class="track-card-footer">
+                <div class="product-actions">
+                    <a href="{% url 'edit_product' product.pk %}">Edit</a>
+                    <a href="{% url 'delete_product' product.pk %}">Delete</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-orders">
+            <p>No products found. Add your first product!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-bar">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">‹ Prev</a>
+        {% endif %}
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next ›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

@@ -1,0 +1,1386 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - The Daily Grocer</title>
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            background: #f5f5f5;
+        }
+
+        .main-content {
+            padding: 50px 0;
+        }
+
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 30px;
+        }
+
+        .checkout-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .payment-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .payment-option:hover {
+            border-color: #28a745;
+            background: #e6f7ed;
+        }
+
+        .payment-option.selected {
+            border-color: #28a745;
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.1));
+        }
+
+        .payment-radio {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .payment-option.selected .payment-radio::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 50%;
+        }
+
+        .payment-icon {
+            width: 50px;
+            height: 50px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .payment-details h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .payment-details p {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .upi-apps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .upi-app {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: white;
+        }
+
+        .upi-app:hover {
+            border-color: #28a745;
+            transform: translateY(-3px);
+        }
+
+        .upi-app.selected {
+            border-color: #28a745;
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.1));
+        }
+
+        .upi-app-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .upi-app-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .upi-input {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .upi-input.active {
+            display: block;
+        }
+
+        .scan-qr-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .scan-qr-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .order-summary {
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .item-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .item-details h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-details p {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .price-breakdown {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .price-row.total {
+            font-size: 20px;
+            font-weight: 700;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+            margin-top: 10px;
+        }
+
+        .price-row.total .amount {
+            color: #28a745;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .place-order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        .place-order-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            color: #10b981;
+            font-size: 13px;
+        }
+
+        /* QR Scanner Modal */
+        .qr-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .qr-modal.active {
+            display: flex;
+        }
+
+        .qr-modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .qr-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #ff4444, #ff6b6b);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            color: white;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+        }
+
+        .qr-close:hover {
+            background: linear-gradient(135deg, #ff0000, #ff4444);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .qr-header {
+            margin-bottom: 25px;
+        }
+
+        .qr-app-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .qr-code-container {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 3px dashed #e0e0e0;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 256px;
+        }
+
+        .qr-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: #28a745;
+            margin: 20px 0;
+        }
+
+        .qr-instructions {
+            background: #e6f7ed;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .qr-instructions h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .qr-instructions ol {
+            text-align: left;
+            padding-left: 20px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .qr-timer {
+            font-size: 14px;
+            color: #999;
+            margin-top: 15px;
+        }
+
+        .qr-timer span {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        @media (max-width: 968px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .upi-apps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-main">
+            <div class="container">
+                <div class="header-content" style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+                    <div class="logo" onclick="window.location.href='{% url 'home' %}'" style="cursor: pointer; flex-shrink: 0;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="logo-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="logo-text">
+                                <h1 style="white-space: nowrap;">The Daily Grocer</h1>
+                                <span>Premium Grocery Store</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav class="main-nav" style="flex-shrink: 0;">
+                        <ul>
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'shop' %}">Shop</a></li>
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="navbar-search" style="flex: 1; max-width: 400px;">
+                        <input type="text" id="navbarSearchBox" placeholder="Search for products..." onkeypress="handleNavbarSearch(event)">
+                        <button class="navbar-search-btn" onclick="performNavbarSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="header-actions" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
+                        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </div>
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-icon" onclick="toggleUserDropdown()">
+                                <img id="navbarProfilePic" src="" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #28a745;">
+                                <i class="fas fa-user" id="navbarUserIcon"></i>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <div class="user-info" id="userInfo"></div>
+                                <ul class="user-menu-list" id="userMenuList"></ul>
+                            </div>
+                        </div>
+                        <div class="wishlist-icon" onclick="window.location.href='{% url 'wishlist' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-heart"></i>
+                            <span class="count" id="wishlistCount" style="position: absolute; top: -8px; right: -8px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                        <div class="cart-icon" onclick="window.location.href='{% url 'cart' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="count" id="cartCount" style="position: absolute; top: -8px; right: -8px; background: #28a745; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="checkout-grid">
+                <!-- Left Section -->
+                <div>
+                    <!-- Delivery Address -->
+                    <div class="checkout-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-map-marker-alt"></i> Delivery Address
+                        </h2>
+                        <form id="addressForm">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" id="fullName" placeholder="Enter your name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Mobile Number *</label>
+                                <input type="tel" id="mobile" placeholder="Enter mobile number" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Pincode *</label>
+                                    <input type="text" id="pincode" placeholder="Enter pincode" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>City *</label>
+                                    <input type="text" id="city" placeholder="Enter city" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Address *</label>
+                                <textarea id="address" rows="3" placeholder="Enter your complete address" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Landmark (Optional)</label>
+                                <input type="text" id="landmark" placeholder="Enter nearby landmark">
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="checkout-section" style="margin-top: 30px;">
+                        <h2 class="section-title">
+                            <i class="fas fa-credit-card"></i> Payment Method
+                        </h2>
+                        <div class="payment-methods">
+                            <!-- UPI Payment -->
+                            <div class="payment-option" onclick="selectPayment('upi')">
+                                <div class="payment-radio"></div>
+                                <div class="payment-icon" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="payment-details">
+                                    <h4>UPI Payment</h4>
+                                    <p>Pay using Google Pay, PhonePe, Paytm</p>
+                                </div>
+                            </div>
+
+                            <!-- UPI Apps -->
+                            <div id="upiApps" class="upi-input">
+                                <div class="upi-apps">
+                                    <div class="upi-app" onclick="selectUPIApp('gpay', this)">
+                                        <div class="upi-app-icon">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" style="width: 45px; height: 45px; object-fit: contain;">
+                                        </div>
+                                        <div class="upi-app-name">Google Pay</div>
+                                    </div>
+                                    <div class="upi-app" onclick="selectUPIApp('phonepe', this)">
+                                        <div class="upi-app-icon">
+                                            <svg width="45" height="45" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                                <rect width="512" height="512" rx="80" fill="#5f259f"/>
+                                                <text x="256" y="320" font-family="Arial, sans-serif" font-size="180" font-weight="bold" fill="white" text-anchor="middle">Pe</text>
+                                            </svg>
+                                        </div>
+                                        <div class="upi-app-name">PhonePe</div>
+                                    </div>
+                                    <div class="upi-app" onclick="selectUPIApp('paytm', this)">
+                                        <div class="upi-app-icon">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" alt="Paytm" style="width: 45px; height: 45px; object-fit: contain;">
+                                        </div>
+                                        <div class="upi-app-name">Paytm</div>
+                                    </div>
+                                </div>
+
+                                <!-- Scan QR Button -->
+                                <button id="scanQRButton" class="scan-qr-btn" onclick="openQRScannerFromButton()">
+                                    <i class="fas fa-qrcode"></i> Scan QR Code to Pay
+                                </button>
+
+                                <div class="form-group">
+                                    <label>Or Enter UPI ID</label>
+                                    <input type="text" id="upiId" placeholder="yourname@paytm">
+                                </div>
+                            </div>
+
+                            <!-- Cash on Delivery -->
+                            <div class="payment-option" onclick="selectPayment('cod')">
+                                <div class="payment-radio"></div>
+                                <div class="payment-icon" style="background: #10b981; color: white;">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="payment-details">
+                                    <h4>Cash on Delivery</h4>
+                                    <p>Pay when you receive your order</p>
+                                </div>
+                            </div>
+
+                            <!-- Card Payment -->
+                            <div class="payment-option" onclick="selectPayment('card')">
+                                <div class="payment-radio"></div>
+                                <div class="payment-icon" style="background: #ff6b6b; color: white;">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="payment-details">
+                                    <h4>Credit/Debit Card</h4>
+                                    <p>Visa, Mastercard, RuPay</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section - Order Summary -->
+                <div class="checkout-section order-summary">
+                    <h2 class="section-title">
+                        <i class="fas fa-shopping-bag"></i> Order Summary
+                    </h2>
+                    <div id="checkoutItemsContainer">
+                        <!-- Cart items will load dynamically -->
+                    </div>
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>Subtotal</span>
+                            <span id="subtotalAmount">₹0.00</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Tax ({{ tax_name }} {{ tax_percentage }}%)</span>
+                            <span id="taxAmount">₹0.00</span>
+                        </div>
+                        <div class="price-row total">
+                            <span class="label">Total Amount</span>
+                            <span class="amount" id="totalAmount">₹0.00</span>
+                        </div>
+                    </div>
+                    <button class="place-order-btn" onclick="placeOrder()">
+                        <i class="fas fa-check-circle"></i> Place Order
+                    </button>
+                    <div class="secure-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>100% Secure Payment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qrModal" class="qr-modal">
+        <div class="qr-modal-content">
+            <button class="qr-close" onclick="closeQRScanner()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="qr-header">
+                <div class="qr-app-logo" id="qrAppLogo">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <h3 id="qrAppName">Scan QR Code</h3>
+                <p>Scan with your UPI app to pay</p>
+            </div>
+            <div class="qr-code-container">
+                <div id="qrcode"></div>
+            </div>
+            <div class="qr-amount">₹<span id="qrAmount">0.00</span></div>
+            <div class="qr-instructions">
+                <h4>How to Pay:</h4>
+                <ol>
+                    <li>Open your UPI app</li>
+                    <li>Scan this QR code</li>
+                    <li>Verify the amount</li>
+                    <li>Complete the payment</li>
+                </ol>
+            </div>
+            <div class="qr-timer">QR Code expires in <span id="qrTimer">0:08</span></div>
+            <button id="paymentCompleteBtn" onclick="markPaymentComplete()" style="width: 100%; margin-top: 20px; background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                <i class="fas fa-check-circle"></i> I've Completed Payment
+            </button>
+        </div>
+    </div>
+
+    <script src="{% static 'store/js/form-validation.js' %}"></script>
+    <script>
+        // Tax configuration from backend
+        const TAX_PERCENTAGE = {{ tax_percentage }};
+        const TAX_NAME = "{{ tax_name }}";
+        
+        // Load user profile
+        function loadUserProfile() {
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || '{}');
+            const userInfo = document.getElementById('userInfo');
+            const userMenuList = document.getElementById('userMenuList');
+            const navbarProfilePic = document.getElementById('navbarProfilePic');
+            const navbarUserIcon = document.getElementById('navbarUserIcon');
+            
+            if (user.loggedIn) {
+                // Show avatar in navbar
+                const firstLetter = (user.name || 'U').charAt(0).toUpperCase();
+                const canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+                
+                // Solid green background
+                ctx.fillStyle = '#28a745';
+                ctx.fillRect(0, 0, 100, 100);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 50px Poppins, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(firstLetter, 50, 50);
+                
+                navbarProfilePic.src = canvas.toDataURL();
+                navbarProfilePic.style.display = 'block';
+                navbarUserIcon.style.display = 'none';
+                
+                // User logged in
+                userInfo.innerHTML = `
+                    <div class="user-greeting">Hello!</div>
+                    <div class="user-name">${user.name || 'User'}</div>
+                    <div class="user-email">${user.email || ''}</div>
+                `;
+                
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                    <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                    <li><a href="{% url 'addresses' %}"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                    <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                `;
+            } else {
+                // Show default icon
+                navbarProfilePic.style.display = 'none';
+                navbarUserIcon.style.display = 'block';
+                
+                // Guest user
+                userInfo.innerHTML = `
+                    <div class="user-greeting">Welcome!</div>
+                    <div class="user-name">Guest User</div>
+                `;
+                
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'auth' %}"><i class="fas fa-sign-in-alt"></i> Login / Register</a></li>
+                    <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Cart</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                `;
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('radhi-user');
+                const cartCountEl = document.getElementById('cartCount');
+                const wishlistCountEl = document.getElementById('wishlistCount');
+                if (cartCountEl) cartCountEl.textContent = '0';
+                if (wishlistCountEl) wishlistCountEl.textContent = '0';
+                alert('✅ Logged out successfully!');
+                window.location.href = '{% url "home" %}';
+            }
+        }
+
+        function toggleUserDropdown() {
+            document.getElementById('userDropdown').classList.toggle('active');
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+
+        // Check if user is logged in
+        function checkLogin() {
+            try {
+                const userDataString = sessionStorage.getItem('radhi-user');
+                if (!userDataString) {
+                    alert('⚠️ Please login to continue with checkout');
+                    window.location.href = '{% url "auth" %}';
+                    return false;
+                }
+                
+                const user = JSON.parse(userDataString);
+                if (!user || !user.loggedIn) {
+                    alert('⚠️ Please login to continue with checkout');
+                    window.location.href = '{% url "auth" %}';
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Error checking login:', error);
+                alert('⚠️ Please login to continue with checkout');
+                window.location.href = '{% url "auth" %}';
+                return false;
+            }
+        }
+
+        // Auto-fill user address
+        function autoFillUserAddress() {
+            try {
+                // Try sessionStorage first, then localStorage
+                let userDataString = sessionStorage.getItem('radhi-user');
+                if (!userDataString) {
+                    userDataString = localStorage.getItem('radhi-user');
+                }
+                if (!userDataString) return;
+                
+                const user = JSON.parse(userDataString);
+                if (user && user.loggedIn) {
+                    const fullNameField = document.getElementById('fullName');
+                    const mobileField = document.getElementById('mobile');
+                    const pincodeField = document.getElementById('pincode');
+                    const cityField = document.getElementById('city');
+                    const addressField = document.getElementById('address');
+                    const landmarkField = document.getElementById('landmark');
+                    
+                    if (fullNameField && user.name) fullNameField.value = user.name;
+                    if (mobileField && user.mobile) mobileField.value = user.mobile;
+                    if (pincodeField && user.pincode) pincodeField.value = user.pincode;
+                    if (cityField && user.city) cityField.value = user.city;
+                    if (addressField && user.address) addressField.value = user.address;
+                }
+            } catch (error) {
+                console.error('Error auto-filling user address:', error);
+            }
+        }
+
+        // Load cart items
+        function loadCheckoutItems() {
+            const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            const container = document.getElementById('checkoutItemsContainer');
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Your cart is empty</p>';
+                updateCheckoutTotals(0);
+                return;
+            }
+
+            let itemsHTML = '';
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+
+                itemsHTML += `
+                    <div class="summary-item">
+                        <div class="item-info">
+                            <img src="${item.img || 'https://via.placeholder.com/60'}" class="item-img" alt="${item.name}">
+                            <div class="item-details">
+                                <h4>${item.name}</h4>
+                                <p>Qty: ${item.qty}</p>
+                            </div>
+                        </div>
+                        <div class="item-price">₹${itemTotal.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = itemsHTML;
+            updateCheckoutTotals(subtotal);
+        }
+
+        // Update totals
+        function updateCheckoutTotals(subtotal) {
+            const deliveryFee = 0; // Free delivery
+            const tax = subtotal * (TAX_PERCENTAGE / 100);
+            const total = subtotal + deliveryFee + tax;
+
+            document.getElementById('subtotalAmount').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('taxAmount').textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById('totalAmount').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        let selectedPayment = null;
+        let selectedUPI = null;
+        let qrTimer = null;
+
+        function selectPayment(method) {
+            selectedPayment = method;
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            const upiApps = document.getElementById('upiApps');
+            if (method === 'upi') {
+                upiApps.classList.add('active');
+            } else {
+                upiApps.classList.remove('active');
+            }
+        }
+
+        function selectUPIApp(app, element) {
+            selectedUPI = app;
+            document.querySelectorAll('.upi-app').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            document.getElementById('scanQRButton').style.display = 'flex';
+        }
+
+        function openQRScannerFromButton() {
+            if (!selectedUPI) {
+                alert('⚠️ Please select a UPI app first');
+                return;
+            }
+            openQRScanner(selectedUPI);
+        }
+
+        function calculateTotal() {
+            const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            let subtotal = 0;
+            cart.forEach(item => {
+                subtotal += item.price * item.qty;
+            });
+            const tax = subtotal * (TAX_PERCENTAGE / 100);
+            const total = subtotal + tax;
+            return { subtotal, tax, total, itemCount: cart.length };
+        }
+
+        function openQRScanner(app) {
+            const appNames = { 'gpay': 'Google Pay', 'phonepe': 'PhonePe', 'paytm': 'Paytm' };
+            document.getElementById('qrAppName').textContent = `Pay with ${appNames[app]}`;
+
+            const totals = calculateTotal();
+            document.getElementById('qrAmount').textContent = totals.total.toFixed(2);
+
+            const qrcodeDiv = document.getElementById('qrcode');
+            qrcodeDiv.innerHTML = '';
+
+            const upiString = `upi://pay?pa=merchant@upi&pn=TheDailyGrocer&am=${totals.total}&cu=INR&tn=Payment`;
+            new QRCode(qrcodeDiv, {
+                text: upiString,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff"
+            });
+
+            document.getElementById('qrModal').classList.add('active');
+            startQRTimer();
+            
+            // Auto-detect payment after 15 seconds (Demo simulation)
+            setTimeout(() => {
+                autoDetectPayment();
+            }, 15000); // 15 seconds
+        }
+
+        function closeQRScanner() {
+            document.getElementById('qrModal').classList.remove('active');
+            if (qrTimer) {
+                clearInterval(qrTimer);
+                qrTimer = null;
+            }
+        }
+
+        function startQRTimer() {
+            let timeLeft = 8; // 8 seconds timer
+            if (qrTimer) clearInterval(qrTimer);
+            
+            qrTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('qrTimer').textContent = `0:${timeLeft.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(qrTimer);
+                    closeQRScanner();
+                    alert('⏰ QR Code expired! Please try again.');
+                }
+            }, 1000);
+        }
+
+        function markPaymentComplete() {
+            const btn = document.getElementById('paymentCompleteBtn');
+            
+            // Change button to show checkmark
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Payment Confirmed!';
+            btn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            btn.style.transform = 'scale(1.05)';
+            btn.disabled = true;
+            
+            // Show success animation
+            setTimeout(() => {
+                if (confirm('✅ Payment Confirmed!\n\nHave you completed the payment successfully?')) {
+                    closeQRScanner();
+                    
+                    // Get form data
+                    const fullName = document.getElementById('fullName').value.trim();
+                    const mobile = document.getElementById('mobile').value.trim();
+                    const pincode = document.getElementById('pincode').value.trim();
+                    const city = document.getElementById('city').value.trim();
+                    const address = document.getElementById('address').value.trim();
+                    const landmark = document.getElementById('landmark').value.trim();
+                    
+                    const totals = calculateTotal();
+                    const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+
+                    const orderData = {
+                        fullName, 
+                        mobile, 
+                        pincode, 
+                        city, 
+                        address, 
+                        landmark,
+                        paymentMethod: selectedPayment,
+                        upiApp: selectedUPI,
+                        cart: cart,
+                        subtotal: totals.subtotal,
+                        tax: totals.tax,
+                        deliveryFee: 0,
+                        total: totals.total,
+                        orderDate: new Date().toISOString()
+                    };
+
+                    // Send order to backend API
+                    fetch('{% url "api_create_order" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(orderData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Save order data with backend order ID
+                            orderData.orderId = data.order_id;
+                            orderData.orderPk = data.order_pk;
+                            localStorage.setItem('radhi-delivery-data', JSON.stringify(orderData));
+                            
+                            // Clear cart
+                            localStorage.removeItem('radhi-cart');
+                            
+                            alert('✅ Payment Successful!\n\nYour order is being processed...');
+                            
+                            // Redirect to delivery page
+                            window.location.href = '{% url "delivery" %}?orderId=' + encodeURIComponent(data.order_id);
+                        } else {
+                            alert('❌ Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('❌ Failed to place order. Please try again.');
+                    });
+                } else {
+                    // Reset button if user says no
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Completed Payment';
+                    btn.style.transform = 'scale(1)';
+                    btn.disabled = false;
+                }
+            }, 300);
+        }
+
+        // Auto-detect payment (Demo simulation)
+        function autoDetectPayment() {
+            const modal = document.getElementById('qrModal');
+            if (!modal.classList.contains('active')) return; // Modal closed, don't proceed
+            
+            const btn = document.getElementById('paymentCompleteBtn');
+            
+            // Show scanning animation
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting Payment...';
+            btn.style.background = 'linear-gradient(135deg, #ffc107, #ff9800)';
+            
+            // After 2 seconds, show success
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Payment Detected!';
+                btn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+                btn.style.transform = 'scale(1.05)';
+                btn.disabled = true;
+                
+                // Show success message
+                setTimeout(() => {
+                    closeQRScanner();
+                    
+                    // Get form data
+                    const fullName = document.getElementById('fullName').value.trim();
+                    const mobile = document.getElementById('mobile').value.trim();
+                    const pincode = document.getElementById('pincode').value.trim();
+                    const city = document.getElementById('city').value.trim();
+                    const address = document.getElementById('address').value.trim();
+                    const landmark = document.getElementById('landmark').value.trim();
+                    
+                    const totals = calculateTotal();
+                    const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+
+                    const orderData = {
+                        fullName, 
+                        mobile, 
+                        pincode, 
+                        city, 
+                        address, 
+                        landmark,
+                        paymentMethod: selectedPayment,
+                        upiApp: selectedUPI,
+                        cart: cart,
+                        subtotal: totals.subtotal,
+                        tax: totals.tax,
+                        deliveryFee: 0,
+                        total: totals.total,
+                        orderDate: new Date().toISOString()
+                    };
+
+                    // Send order to backend API
+                    fetch('{% url "api_create_order" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(orderData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Save order data with backend order ID
+                            orderData.orderId = data.order_id;
+                            orderData.orderPk = data.order_pk;
+                            localStorage.setItem('radhi-delivery-data', JSON.stringify(orderData));
+                            
+                            // Clear cart
+                            localStorage.removeItem('radhi-cart');
+                            
+                            alert('✅ Payment Successful!\n\n💰 Amount: ₹' + document.getElementById('qrAmount').textContent + '\n\nYour order is being processed...');
+                            
+                            // Redirect to delivery page
+                            window.location.href = '{% url "delivery" %}?orderId=' + encodeURIComponent(data.order_id);
+                        } else {
+                            alert('❌ Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('❌ Failed to place order. Please try again.');
+                    });
+                }, 1500);
+            }, 2000);
+        }
+
+        function placeOrder() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const mobile = document.getElementById('mobile').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const landmark = document.getElementById('landmark').value.trim();
+
+            if (!fullName || !mobile || !pincode || !city || !address) {
+                alert('⚠️ Please fill all required fields');
+                return;
+            }
+
+            if (!selectedPayment) {
+                alert('⚠️ Please select a payment method');
+                return;
+            }
+
+            if (selectedPayment === 'upi' && !selectedUPI) {
+                alert('⚠️ Please select a UPI app');
+                return;
+            }
+
+            const totals = calculateTotal();
+            const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+
+            const orderData = {
+                fullName, 
+                mobile, 
+                pincode, 
+                city, 
+                address, 
+                landmark,
+                paymentMethod: selectedPayment,
+                upiApp: selectedUPI,
+                cart: cart,
+                subtotal: totals.subtotal,
+                tax: totals.tax,
+                deliveryFee: totals.deliveryFee,
+                total: totals.total,
+                orderDate: new Date().toISOString()
+            };
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            // Send order to backend API
+            fetch('{% url "api_create_order" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Save order data with backend order ID
+                    orderData.orderId = data.order_id;
+                    orderData.orderPk = data.order_pk;
+                    localStorage.setItem('radhi-delivery-data', JSON.stringify(orderData));
+                    
+                    // Clear cart
+                    localStorage.removeItem('radhi-cart');
+                    
+                    // Redirect to delivery page
+                    window.location.href = '{% url "delivery" %}?orderId=' + encodeURIComponent(data.order_id);
+                } else {
+                    alert('❌ Error: ' + data.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ Failed to place order. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+            });
+        }
+
+        // Update cart and wishlist counts
+        function updateCounts() {
+            const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            const wishlist = JSON.parse(localStorage.getItem('radhi-wishlist')) || [];
+            
+            console.log('Updating counts - Cart:', cart.length, 'Wishlist:', wishlist.length);
+            
+            const cartCount = document.getElementById('cartCount');
+            const wishlistCount = document.getElementById('wishlistCount');
+            
+            if (cartCount) {
+                cartCount.textContent = cart.length;
+                console.log('Cart count updated to:', cart.length);
+            }
+            if (wishlistCount) {
+                wishlistCount.textContent = wishlist.length;
+                console.log('Wishlist count updated to:', wishlist.length);
+            }
+        }
+
+        // Navbar search functions
+        function handleNavbarSearch(event) {
+            if (event.key === 'Enter') {
+                performNavbarSearch();
+            }
+        }
+        
+        function performNavbarSearch() {
+            const searchBox = document.getElementById('navbarSearchBox');
+            const query = searchBox.value.trim();
+            if (query) {
+                window.location.href = `{% url 'home' %}?search=${encodeURIComponent(query)}`;
+            }
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const themeIcon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // User dropdown toggle
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            if (checkLogin()) {
+                loadUserProfile();
+                loadCheckoutItems();
+                autoFillUserAddress();
+                updateCounts();
+            }
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                const themeIcon = document.getElementById('themeIcon');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.user-menu')) {
+                document.getElementById('userDropdown').classList.remove('active');
+            }
+        });
+
+        // Cross-tab synchronization - Listen for localStorage changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'radhi-cart') {
+                // Cart changed in another tab - reload items and update count
+                loadCheckoutItems();
+                const cart = JSON.parse(e.newValue || '[]');
+                const cartCount = document.getElementById('cartCount');
+                if (cartCount) {
+                    cartCount.textContent = cart.length;
+                }
+                console.log('Cart updated from another tab');
+            } else if (e.key === 'radhi-wishlist') {
+                // Wishlist changed - update count
+                const wishlist = JSON.parse(e.newValue || '[]');
+                const wishlistCount = document.getElementById('wishlistCount');
+                if (wishlistCount) {
+                    wishlistCount.textContent = wishlist.length;
+                }
+                console.log('Wishlist updated from another tab');
+            }
+        });
+    </script>
+</body>
+</html>

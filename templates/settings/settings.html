@@ -1,0 +1,627 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+  .settings-page { max-width: 1200px; }
+  .settings-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 960px) {
+    .settings-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+  .settings-nav {
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(15,23,42,0.06);
+    border:1px solid #e5e7eb;
+    padding:16px 14px;
+    position:sticky;
+    top:80px;
+    align-self:flex-start;
+  }
+  .settings-nav h3{
+    margin:0 0 10px 0;
+    font-size:14px;
+    font-weight:600;
+    color:#111827;
+  }
+  .settings-nav ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .settings-nav a{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+    border-radius:8px;
+    font-size:13px;
+    color:#374151;
+    text-decoration:none;
+  }
+  .settings-nav a:hover{
+    background:#f3f4f6;
+  }
+  .settings-card{
+    background:#fff;
+    border-radius:12px;
+    padding:18px 20px;
+    box-shadow:0 2px 10px rgba(15,23,42,0.06);
+    border:1px solid #e5e7eb;
+    margin-bottom:18px;
+  }
+  .settings-card h3{
+    margin:0 0 6px 0;
+    font-size:16px;
+    color:#111827;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .settings-card p.desc{
+    margin:0 0 16px 0;
+    font-size:12px;
+    color:#6b7280;
+  }
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:14px 18px;
+  }
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .form-group label{
+    font-size:12px;
+    font-weight:600;
+    color:#374151;
+  }
+  .form-group small{
+    font-size:11px;
+    color:#9ca3af;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea{
+    padding:8px 12px;
+    border-radius:8px;
+    border:1px solid #e5e7eb;
+    font-size:13px;
+  }
+  .form-group textarea{
+    min-height:70px;
+    resize:vertical;
+  }
+  .inline-radio{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    font-size:13px;
+  }
+  .inline-radio label{
+    font-weight:400;
+    color:#374151;
+  }
+  .toggle{
+    position:relative;
+    width:44px;
+    height:24px;
+  }
+  .toggle input{
+    opacity:0;
+    width:0;
+    height:0;
+  }
+  .toggle-slider{
+    position:absolute;
+    cursor:pointer;
+    inset:0;
+    background:#e5e7eb;
+    border-radius:999px;
+    transition:.2s;
+  }
+  .toggle-slider:before{
+    position:absolute;
+    content:"";
+    height:18px;
+    width:18px;
+    left:3px;
+    top:3px;
+    background:white;
+    border-radius:999px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.2);
+    transition:.2s;
+  }
+  .toggle input:checked + .toggle-slider{
+    background:#22c55e;
+  }
+  .toggle input:checked + .toggle-slider:before{
+    transform:translateX(18px);
+  }
+  .toggle-label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    color:#374151;
+  }
+  .badge-muted{
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:999px;
+    background:#f3f4f6;
+    color:#6b7280;
+  }
+  .settings-actions{
+    display:flex;
+    gap:12px;
+    margin-top:20px;
+    justify-content:flex-end;
+  }
+  .settings-actions button{
+    padding:8px 18px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    font-size:13px;
+  }
+  .btn-primary{
+    background:#22c55e;
+    color:#fff;
+  }
+  .btn-secondary{
+    background:#f3f4f6;
+    color:#374151;
+    border:1px solid #e5e7eb;
+  }
+  .logs-viewer{
+    max-height:140px;
+    overflow:auto;
+    background:#0f172a;
+    color:#e5e7eb;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size:11px;
+    padding:10px 12px;
+    border-radius:8px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delivery-page settings-page">
+  <div class="page-header">
+    <h2><i data-lucide="settings"></i> Admin Settings</h2>
+  </div>
+
+  {% if messages %}
+    <div style="margin-bottom: 20px;">
+      {% for message in messages %}
+        <div style="padding: 12px 20px; background: #d1fae5; color: #065f46; border-radius: 8px; margin-bottom: 10px;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="settings-layout">
+    <!-- Sidebar navigation -->
+    <nav class="settings-nav">
+      <h3>Sections</h3>
+      <ul>
+        <li><a href="#general"><i data-lucide="store"></i> General</a></li>
+        <li><a href="#delivery"><i data-lucide="truck"></i> Delivery</a></li>
+        <li><a href="#payment"><i data-lucide="credit-card"></i> Payments</a></li>
+        <li><a href="#product"><i data-lucide="box"></i> Products</a></li>
+        <li><a href="#security"><i data-lucide="shield"></i> Users & Security</a></li>
+        <li><a href="#notifications"><i data-lucide="bell"></i> Notifications</a></li>
+        <li><a href="#orders"><i data-lucide="shopping-bag"></i> Orders & Shipping</a></li>
+        <li><a href="#seo"><i data-lucide="search"></i> SEO & Maintenance</a></li>
+        <li><a href="#backup"><i data-lucide="database"></i> Backup & Logs</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main content (single form for all settings) -->
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <!-- 1. General Settings -->
+      <section id="general" class="settings-card">
+        <h3><i data-lucide="store"></i> General Settings</h3>
+        <p class="desc">Store identity and basic configuration.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="store_name">Store Name *</label>
+            <input id="store_name" name="store_name" type="text" required maxlength="120" placeholder="e.g. Fresh Grocery Mart" value="{{ settings.store_name }}">
+            <small>Shown on admin panel, invoices, and emails.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="store_logo">Store Logo</label>
+            <input id="store_logo" name="store_logo" type="file" accept="image/*">
+            <small>PNG / JPG, max 2MB for best results.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="contact_email">Contact Email *</label>
+            <input id="contact_email" name="contact_email" type="email" required placeholder="support@example.com" value="{{ settings.contact_email }}">
+          </div>
+
+          <div class="form-group">
+            <label for="contact_phone">Phone Number *</label>
+            <input id="contact_phone" name="contact_phone" type="tel" required pattern="^[0-9+\-\s]{7,15}$" placeholder="+91 98765 43210" value="{{ settings.contact_phone }}">
+            <small>Digits, spaces and + allowed.</small>
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="store_address">Store Address</label>
+            <textarea id="store_address" name="store_address" rows="2" placeholder="Street, City, State, Pincode">{{ settings.store_address }}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="currency">Currency</label>
+            <select id="currency" name="currency">
+              <option value="INR" selected>INR (₹)</option>
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="timezone">Time Zone</label>
+            <select id="timezone" name="timezone">
+              <option value="Asia/Kolkata" selected>Asia / Kolkata (IST)</option>
+              <option value="UTC">UTC</option>
+              <option value="Asia/Dubai">Asia / Dubai</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="language">Language</label>
+            <select id="language" name="language">
+              <option value="en" selected>English</option>
+              <option value="hi">Hindi</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Delivery Settings -->
+      <section id="delivery" class="settings-card">
+        <h3><i data-lucide="truck"></i> Delivery Settings</h3>
+        <p class="desc">Configure delivery charges, slots, and serviceable areas.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Delivery Charges Type</label>
+            <div class="inline-radio">
+              <label><input type="radio" name="delivery_charge_type" value="fixed" checked> Fixed</label>
+              <label><input type="radio" name="delivery_charge_type" value="distance"> Distance Based</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="delivery_charge">Delivery Charge (₹)</label>
+            <input id="delivery_charge" name="delivery_charge" type="number" min="0" step="0.01" value="{{ settings.delivery_charge|default:'40' }}">
+          </div>
+
+          <div class="form-group">
+            <label for="min_order_amount">Minimum Order Amount (₹)</label>
+            <input id="min_order_amount" name="min_order_amount" type="number" min="0" step="0.01" value="{{ settings.min_order_amount|default:'199' }}">
+          </div>
+
+          <div class="form-group">
+            <label for="free_delivery_limit">Free Delivery Above (₹)</label>
+            <input id="free_delivery_limit" name="free_delivery_limit" type="number" min="0" step="0.01" value="{{ settings.free_delivery_limit|default:'999' }}">
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="delivery_slots">Delivery Time Slots</label>
+            <textarea id="delivery_slots" name="delivery_slots" placeholder="e.g. 9–11 AM, 11–1 PM, 4–6 PM"></textarea>
+            <small>Comma separated list of slots.</small>
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="service_pincodes">Serviceable Pincodes</label>
+            <textarea id="service_pincodes" name="service_pincodes" placeholder="400001, 400002, 400003"></textarea>
+            <small>Enter pincode list separated by commas.</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Payment Settings -->
+      <section id="payment" class="settings-card">
+        <h3><i data-lucide="credit-card"></i> Payment Settings</h3>
+        <p class="desc">Enable payment methods and configure gateway credentials.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="toggle-label">
+              <label class="toggle">
+                <input type="checkbox" name="cod_enabled" {% if settings.cod_enabled or not settings %}checked{% endif %}>
+                <span class="toggle-slider"></span>
+              </label>
+              Cash on Delivery (COD)
+            </label>
+            <small>Allow customers to pay at the time of delivery.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="toggle-label">
+              <label class="toggle">
+                <input type="checkbox" name="online_payments_enabled" {% if settings.online_payments_enabled or not settings %}checked{% endif %}>
+                <span class="toggle-slider"></span>
+              </label>
+              Online Payments
+            </label>
+            <small>Enable UPI, cards and net banking via gateway.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="pg_api_key">Payment Gateway API Key</label>
+            <input id="pg_api_key" name="pg_api_key" type="text" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="pg_secret_key">Payment Gateway Secret</label>
+            <input id="pg_secret_key" name="pg_secret_key" type="password" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="refund_mode">Refund Options</label>
+            <select id="refund_mode" name="refund_mode">
+              <option value="manual" selected>Manual (via support)</option>
+              <option value="gateway">Through Payment Gateway</option>
+              <option value="none">No Refunds</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Product Settings -->
+      <section id="product" class="settings-card">
+        <h3><i data-lucide="box"></i> Product Settings</h3>
+        <p class="desc">Control pricing defaults and inventory alerts.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="default_tax">Default Tax Percentage (%)</label>
+            <input id="default_tax" name="default_tax" type="number" min="0" max="100" step="0.01" value="18">
+          </div>
+
+          <div class="form-group">
+            <label for="low_stock_limit">Low Stock Alert Limit</label>
+            <input id="low_stock_limit" name="low_stock_limit" type="number" min="1" value="10">
+            <small>Products below this quantity will be flagged.</small>
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>Allowed Unit Types</label>
+            <div class="inline-radio">
+              <label><input type="checkbox" name="unit_types" value="kg" checked> Kg</label>
+              <label><input type="checkbox" name="unit_types" value="g" checked> Gram</label>
+              <label><input type="checkbox" name="unit_types" value="l" checked> Liter</label>
+              <label><input type="checkbox" name="unit_types" value="ml"> Milli Liter</label>
+              <label><input type="checkbox" name="unit_types" value="pc" checked> Piece</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. User & Security Settings -->
+      <section id="security" class="settings-card">
+        <h3><i data-lucide="shield"></i> User & Security</h3>
+        <p class="desc">Manage admin profile, passwords and access control.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="admin_name">Admin Name</label>
+            <input id="admin_name" name="admin_name" type="text" maxlength="80">
+          </div>
+
+          <div class="form-group">
+            <label for="admin_email">Admin Email</label>
+            <input id="admin_email" name="admin_email" type="email">
+          </div>
+
+          <div class="form-group">
+            <label for="current_password">Current Password</label>
+            <input id="current_password" name="current_password" type="password" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="new_password">New Password</label>
+            <input id="new_password" name="new_password" type="password" minlength="8" autocomplete="off">
+            <small>Minimum 8 characters, mix of letters & numbers.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="confirm_password">Confirm New Password</label>
+            <input id="confirm_password" name="confirm_password" type="password" minlength="8" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="role">Default Admin Role</label>
+            <select id="role" name="role">
+              <option value="owner" selected>Owner</option>
+              <option value="manager">Manager</option>
+              <option value="staff">Staff (Limited Access)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="toggle-label">
+              <label class="toggle">
+                <input type="checkbox" name="two_factor_enabled">
+                <span class="toggle-slider"></span>
+              </label>
+              Two-Factor Authentication
+            </label>
+            <small>Send OTP via email / SMS during login.</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Notification Settings -->
+      <section id="notifications" class="settings-card">
+        <h3><i data-lucide="bell"></i> Notification Settings</h3>
+        <p class="desc">Decide how you and your customers receive updates.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="toggle-label">
+              <label class="toggle">
+                <input type="checkbox" name="email_notif" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              Email Notifications
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="toggle-label">
+              <label class="toggle">
+                <input type="checkbox" name="sms_notif">
+                <span class="toggle-slider"></span>
+              </label>
+              SMS Notifications
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="toggle-label">
+              <label class="toggle">
+                <input type="checkbox" name="push_notif">
+                <span class="toggle-slider"></span>
+              </label>
+              Push Notifications
+            </label>
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="whatsapp_api">WhatsApp API Key</label>
+            <input id="whatsapp_api" name="whatsapp_api" type="text" autocomplete="off">
+            <small>Used for sending WhatsApp order updates.</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Order & Shipping Settings -->
+      <section id="orders" class="settings-card">
+        <h3><i data-lucide="shopping-bag"></i> Order & Shipping</h3>
+        <p class="desc">Control how orders flow through your system.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="toggle-label">
+              <label class="toggle">
+                <input type="checkbox" name="auto_confirm_orders" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              Auto-confirm New Orders
+            </label>
+            <small>If disabled, orders will start in “Pending Review”.</small>
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="order_workflow">Order Status Workflow</label>
+            <textarea id="order_workflow" name="order_workflow" placeholder="Pending → Confirmed → Packed → Out for Delivery → Delivered"></textarea>
+            <small>Define the pipeline shown on delivery & order pages.</small>
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="cancel_policy">Cancel / Return Policy</label>
+            <textarea id="cancel_policy" name="cancel_policy" rows="3" placeholder="Customers can cancel orders before packing stage..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. SEO & Maintenance -->
+      <section id="seo" class="settings-card">
+        <h3><i data-lucide="search"></i> SEO & Maintenance</h3>
+        <p class="desc">Improve discoverability and manage downtime.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="meta_title">Meta Title</label>
+            <input id="meta_title" name="meta_title" type="text" maxlength="60">
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="meta_description">Meta Description</label>
+            <textarea id="meta_description" name="meta_description" rows="2" maxlength="160"></textarea>
+            <small>Ideal length 120–160 characters.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="toggle-label">
+              <label class="toggle">
+                <input type="checkbox" name="maintenance_mode">
+                <span class="toggle-slider"></span>
+              </label>
+              Maintenance Mode
+            </label>
+            <small>Show “We’ll be back soon” page to customers.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="analytics_id">Analytics Tracking ID</label>
+            <input id="analytics_id" name="analytics_id" type="text" placeholder="G-XXXXXXXXXX">
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Backup & Logs -->
+      <section id="backup" class="settings-card">
+        <h3><i data-lucide="database"></i> Backup & Logs</h3>
+        <p class="desc">Database backups and recent admin activities.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Database Backup</label>
+            <button type="button" class="btn-primary">Download Latest Backup</button>
+            <small class="badge-muted">Manual action · backend hook required</small>
+          </div>
+
+          <div class="form-group">
+            <label for="restore_file">Restore from Backup</label>
+            <input id="restore_file" name="restore_file" type="file" accept=".sql,.zip,.gz">
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>Recent Activity Logs</label>
+            <div class="logs-viewer">
+              [INFO] Admin logged in<br>
+              [INFO] Payment report exported<br>
+              [WARN] Low stock alert for Product #102<br>
+              [INFO] Invoice #INV-1005 generated<br>
+              ...
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Global Actions -->
+      <div class="settings-actions">
+        <button type="reset" class="btn-secondary">Reset</button>
+        <button type="submit" class="btn-primary">Save All Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

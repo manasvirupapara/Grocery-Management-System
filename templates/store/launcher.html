@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛒 Grocery Websites Launcher</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+        
+        .websites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .website-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+            animation: fadeInUp 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .website-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .website-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .website-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .website-card h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .website-card p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .pages-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .page-link {
+            background: #f0f0f0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #555;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        
+        .page-link:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .main-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .main-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.9;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .websites-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Grocery Websites Collection</h1>
+            <p>Choose your favorite grocery store and start shopping!</p>
+        </div>
+        
+        <div class="websites-grid">
+            <!-- Radhi Fresh Mart -->
+            <div class="website-card">
+                <div class="website-icon">🌸</div>
+                <h2>Radhi Fresh Mart</h2>
+                <p>Premium grocery store with purple gradient theme. Complete e-commerce experience with 20+ products across 12 categories.</p>
+                <div class="pages-list">
+                    <a href="radhi-shop.html" class="page-link">🛍️ Shop</a>
+                    <a href="radhi-cart.html" class="page-link">🛒 Cart</a>
+                    <a href="radhi-wishlist.html" class="page-link">❤️ Wishlist</a>
+                    <a href="radhi-about.html" class="page-link">ℹ️ About</a>
+                    <a href="radhi-contact.html" class="page-link">📞 Contact</a>
+                    <a href="radhi-auth.html" class="page-link">🔐 Login</a>
+                </div>
+                <a href="radhi.html" class="main-btn">Open Radhi Fresh Mart</a>
+            </div>
+            
+            <!-- Ekomart -->
+            <div class="website-card">
+                <div class="website-icon">🌿</div>
+                <h2>Ekomart</h2>
+                <p>Green-themed grocery store with modern design. Features 20 products with advanced filtering and sorting options.</p>
+                <div class="pages-list">
+                    <a href="shop.html" class="page-link">🛍️ Shop</a>
+                    <a href="cart.html" class="page-link">🛒 Cart</a>
+                    <a href="wishlist.html" class="page-link">❤️ Wishlist</a>
+                </div>
+                <a href="ma.html" class="main-btn">Open Ekomart</a>
+            </div>
+            
+            <!-- Radhika Store -->
+            <div class="website-card">
+                <div class="website-icon">🌺</div>
+                <h2>Radhika Store</h2>
+                <p>Elegant grocery shopping experience with beautiful UI and smooth animations.</p>
+                <a href="radhika.html" class="main-btn">Open Radhika Store</a>
+            </div>
+            
+            <!-- Radhu Mart -->
+            <div class="website-card">
+                <div class="website-icon">🏪</div>
+                <h2>Radhu Mart</h2>
+                <p>Simple and clean grocery store interface for quick shopping.</p>
+                <a href="radhu.html" class="main-btn">Open Radhu Mart</a>
+            </div>
+            
+            <!-- Other Stores -->
+            <div class="website-card">
+                <div class="website-icon">🎯</div>
+                <h2>More Stores</h2>
+                <p>Additional grocery store variations and themes.</p>
+                <div class="pages-list">
+                    <a href="index.html" class="page-link">🏠 Index</a>
+                    <a href="rad.html" class="page-link">🛒 Rad</a>
+                    <a href="ra.html" class="page-link">🛍️ Ra</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>✨ All websites are fully functional with cart, wishlist, and search features ✨</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">Made with ❤️ for grocery shopping experience</p>
+        </div>
+    </div>
+</body>
+</html>

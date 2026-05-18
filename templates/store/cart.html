@@ -1,0 +1,801 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - The Daily Grocer</title>
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            padding: 50px 0;
+        }
+        
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            color: #333;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .cart-items {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .batch-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .select-all-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .batch-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #28a745;
+        }
+        
+        .batch-checkbox-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .delete-selected-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .delete-selected-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .delete-selected-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .item-checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .cart-item {
+            display: flex;
+            gap: 20px;
+            padding: 25px 0;
+            border-bottom: 2px solid #f5f5f5;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 15px;
+            background: #f9f9f9;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-details h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .item-price {
+            font-size: 24px;
+            color: #28a745;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .qty-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #28a745;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #28a745;
+            transition: 0.3s;
+        }
+        
+        .qty-btn:hover {
+            background: #28a745;
+            color: white;
+        }
+        
+        .qty-display {
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .remove-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        
+        .remove-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .item-total {
+            font-size: 24px;
+            font-weight: 700;
+            color: #28a745;
+        }
+        
+        .cart-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .cart-summary h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 16px;
+        }
+        
+        .summary-row.total {
+            border-bottom: none;
+            font-size: 24px;
+            font-weight: 700;
+            color: #28a745;
+            padding-top: 25px;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 25px;
+            transition: 0.3s;
+        }
+        
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 100px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .empty-cart i {
+            font-size: 80px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .empty-cart h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .empty-cart p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .back-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
+        }
+        
+        @media (max-width: 968px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+            .cart-item {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-main">
+            <div class="container">
+                <div class="header-content" style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+                    <div class="logo" onclick="window.location.href='{% url 'home' %}'" style="cursor: pointer; flex-shrink: 0;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="logo-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="logo-text">
+                                <h1 style="white-space: nowrap;">The Daily Grocer</h1>
+                                <span>Premium Grocery Store</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="main-nav" style="flex-shrink: 0;">
+                        <ul>
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'shop' %}">Shop</a></li>
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="navbar-search" style="flex: 1; max-width: 400px;">
+                        <input type="text" id="navbarSearchBox" placeholder="Search for products..." onkeypress="handleNavbarSearch(event)">
+                        <button class="navbar-search-btn" onclick="performNavbarSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="header-actions" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
+                        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </div>
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-icon" onclick="toggleUserDropdown()">
+                                <img id="navbarProfilePic" src="" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #28a745;">
+                                <i class="fas fa-user" id="navbarUserIcon"></i>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <div class="user-info" id="userInfo"></div>
+                                <ul class="user-menu-list" id="userMenuList"></ul>
+                            </div>
+                        </div>
+                        <div class="wishlist-icon" onclick="window.location.href='{% url 'wishlist' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-heart"></i>
+                            <span class="count" id="wishlistCount" style="position: absolute; top: -8px; right: -8px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                        <div class="cart-icon" onclick="window.location.href='{% url 'cart' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="count" id="cartCount" style="position: absolute; top: -8px; right: -8px; background: #28a745; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            <h2><i class="fas fa-shopping-bag"></i> Shopping Cart</h2>
+            <div id="cartContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Cart Functions
+        function loadCart() {
+            let cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            
+            // Fix old data: convert quantity to qty and ensure price is valid
+            cart = cart.map(item => ({
+                ...item,
+                qty: item.qty || item.quantity || 1,
+                img: item.img || item.image,
+                price: parseFloat(item.price) || 0
+            }));
+            
+            // Remove items with invalid price (0 or undefined)
+            cart = cart.filter(item => item.price > 0);
+            
+            // Save fixed data
+            localStorage.setItem('radhi-cart', JSON.stringify(cart));
+            
+            const container = document.getElementById('cartContent');
+            
+            // Update cart count in navbar
+            updateCartCount();
+            updateWishlistCount();
+            
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-bag"></i>
+                        <h3>Your cart is empty</h3>
+                        <p>Add some fresh products to get started!</p>
+                        <a href="{% url 'home' %}" class="back-btn">Continue Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            let subtotal = 0;
+            let itemsHTML = '';
+            
+            // Add batch controls
+            const batchControlsHTML = `
+                <div class="batch-controls">
+                    <div class="select-all-wrapper">
+                        <input type="checkbox" id="selectAllCheckbox" class="batch-checkbox" onchange="toggleSelectAll()">
+                        <label for="selectAllCheckbox" class="batch-checkbox-label">Select All</label>
+                    </div>
+                    <button class="delete-selected-btn" id="deleteSelectedBtn" onclick="deleteSelected()" disabled>
+                        <i class="fas fa-trash"></i>
+                        Delete Selected (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+            `;
+            
+            cart.forEach((item, index) => {
+                const itemQty = item.qty || 1;
+                const itemPrice = parseFloat(item.price) || 0;
+                const itemTotal = itemPrice * itemQty;
+                const itemWeight = (item.weight && item.weight !== 'Default' && item.weight !== '') ? item.weight : null;
+                const originalPrice = parseFloat(item.originalPrice) || 0;
+                const discountPct = parseFloat(item.discountPct) || 0;
+                const hasDiscount = discountPct > 0 && originalPrice > itemPrice;
+                subtotal += itemTotal;
+                
+                itemsHTML += `
+                    <div class="cart-item">
+                        <div class="item-checkbox-wrapper">
+                            <input type="checkbox" class="batch-checkbox item-checkbox" data-index="${index}" onchange="updateSelectedCount()">
+                            <img src="${item.img || item.image || 'https://via.placeholder.com/120'}" alt="${item.name}" class="item-img">
+                        </div>
+                        <div class="item-details">
+                            <h3>${item.name}${itemWeight ? ` <span style="color: #666; font-size: 14px; font-weight: 500;">(${itemWeight})</span>` : ''}</h3>
+                            <div class="item-price">₹${itemPrice.toFixed(2)}${itemWeight ? ` per ${itemWeight}` : ''}</div>
+                            <div class="qty-controls">
+                                <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                                <span class="qty-display">${itemQty}</span>
+                                <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                            </div>
+                            <div class="item-actions">
+                                <button class="remove-btn" onclick="removeItem(${index})">
+                                    <i class="fas fa-trash"></i> 
+                                </button>
+                            </div>
+                        </div>
+                        <div class="item-total">₹${itemTotal.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            const gstRate = 0.18; // 18% GST
+            const gstAmount = subtotal * gstRate;
+            const total = subtotal + gstAmount;
+            
+            container.innerHTML = `
+                <div class="cart-layout">
+                    <div class="cart-items">
+                        ${batchControlsHTML}
+                        ${itemsHTML}
+                    </div>
+                    <div class="cart-summary">
+                        <h3>Order Summary</h3>
+                        <div class="summary-row">
+                            <span>Subtotal (${cart.length} items)</span>
+                            <span>₹${subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>GST (18%)</span>
+                            <span>₹${gstAmount.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span>₹${total.toFixed(2)}</span>
+                        </div>
+                        <button class="checkout-btn" onclick="proceedToCheckout()">
+                            <i class="fas fa-lock"></i> Proceed to Checkout
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updateQty(index, change) {
+            let cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            const newQty = (cart[index].qty || 1) + change;
+            
+            if (newQty > 8) {
+                alert('⚠️ Maximum 8 items allowed per product!');
+                return;
+            }
+            
+            cart[index].qty = newQty;
+            
+            if (cart[index].qty < 1) {
+                cart[index].qty = 1;
+            }
+            
+            localStorage.setItem('radhi-cart', JSON.stringify(cart));
+            loadCart();
+        }
+        
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            cart.splice(index, 1);
+            localStorage.setItem('radhi-cart', JSON.stringify(cart));
+            loadCart();
+        }
+        
+        // Batch Functions
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+            
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            
+            updateSelectedCount();
+        }
+        
+        function updateSelectedCount() {
+            const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+            const selectedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            
+            // Update selected count
+            const selectedCount = selectedCheckboxes.length;
+            if (selectedCountSpan) {
+                selectedCountSpan.textContent = selectedCount;
+            }
+            
+            // Enable/disable delete button
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.disabled = selectedCount === 0;
+            }
+            
+            // Update select all checkbox state
+            if (selectAllCheckbox) {
+                if (selectedCount === 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (selectedCount === itemCheckboxes.length) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                } else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                }
+            }
+        }
+        
+        function deleteSelected() {
+            const selectedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+            
+            if (selectedCheckboxes.length === 0) {
+                alert('⚠️ Please select items to delete');
+                return;
+            }
+            
+            if (!confirm(`🗑️ Delete ${selectedCheckboxes.length} item(s)?\n\nAre you sure you want to remove selected items from cart?`)) {
+                return;
+            }
+            
+            // Get indices of selected items (in reverse order to avoid index shifting)
+            const indicesToDelete = Array.from(selectedCheckboxes)
+                .map(checkbox => parseInt(checkbox.dataset.index))
+                .sort((a, b) => b - a);
+            
+            // Remove items from cart
+            let cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            indicesToDelete.forEach(index => {
+                cart.splice(index, 1);
+            });
+            
+            localStorage.setItem('radhi-cart', JSON.stringify(cart));
+            
+            // Show success message
+            alert(`✅ ${indicesToDelete.length} item(s) removed from cart!`);
+            
+            // Reload cart
+            loadCart();
+        }
+        
+        function proceedToCheckout() {
+            const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            if (cart.length === 0) {
+                alert('🛒 Your cart is empty!\n\nPlease add some items before checkout.');
+                return;
+            }
+            
+            // Check if user is logged in (from sessionStorage)
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || localStorage.getItem('radhi-user') || '{}');
+            
+            if (!user.loggedIn || user.isGuest) {
+                // User not logged in or is guest - show popup and redirect
+                if (confirm('🔒 Login Required!\n\nYou need to login to proceed with checkout.\n\n✅ Click OK to go to login page\n❌ Click Cancel to continue shopping')) {
+                    window.location.href = '{% url "auth" %}';
+                }
+            } else {
+                // User is logged in - show checkout popup with order summary and redirect
+                const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                const gst = subtotal * 0.18;
+                const total = (subtotal + gst).toFixed(2);
+                alert('✅ Proceeding to Checkout!\n\n' + 
+                      '📦 Order Summary:\n' + 
+                      `Items: ${cart.length}\n` +
+                      `Total: ₹${total}\n\n` +
+                      'Redirecting to checkout page...');
+                
+                // Redirect to checkout page
+                window.location.href = '{% url "checkout" %}';
+            }
+        }
+        
+        // Navbar Functions
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            const cartCount = document.getElementById('cartCount');
+            if (cartCount) {
+                // Show total number of unique items (not quantity)
+                cartCount.textContent = cart.length;
+            }
+        }
+        
+        function updateWishlistCount() {
+            const wishlist = JSON.parse(localStorage.getItem('radhi-wishlist')) || [];
+            const wishlistCount = document.getElementById('wishlistCount');
+            if (wishlistCount) {
+                wishlistCount.textContent = wishlist.length;
+            }
+        }
+        
+        // Load user profile
+        function loadUserProfile() {
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || localStorage.getItem('radhi-user') || '{}');
+            const userInfo = document.getElementById('userInfo');
+            const userMenuList = document.getElementById('userMenuList');
+            const navbarProfilePic = document.getElementById('navbarProfilePic');
+            const navbarUserIcon = document.getElementById('navbarUserIcon');
+            
+            if (user.loggedIn) {
+                // Show avatar in navbar
+                const firstLetter = (user.name || 'U').charAt(0).toUpperCase();
+                const canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+                
+                // Solid green background
+                ctx.fillStyle = '#28a745';
+                ctx.fillRect(0, 0, 100, 100);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 50px Poppins, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(firstLetter, 50, 50);
+                
+                navbarProfilePic.src = canvas.toDataURL();
+                navbarProfilePic.style.display = 'block';
+                navbarUserIcon.style.display = 'none';
+                
+                // User logged in
+                userInfo.innerHTML = `
+                    <div class="user-greeting">Hello!</div>
+                    <div class="user-name">${user.name || 'User'}</div>
+                    <div class="user-email">${user.email || ''}</div>
+                `;
+                
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                    <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                    <li><a href="{% url 'addresses' %}"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                    <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                `;
+            } else {
+                // Show default icon
+                navbarProfilePic.style.display = 'none';
+                navbarUserIcon.style.display = 'block';
+                
+                // Guest user
+                userInfo.innerHTML = `
+                    <div class="user-greeting">Welcome!</div>
+                    <div class="user-name">Guest User</div>
+                `;
+                
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'auth' %}"><i class="fas fa-sign-in-alt"></i> Login / Register</a></li>
+                    <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Cart</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                `;
+            }
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('radhi-user');
+                alert('✅ Logged out successfully!');
+                window.location.href = '{% url "home" %}';
+            }
+        }
+        
+        // Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const themeIcon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // User Dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+        
+        // Navbar Search
+        function handleNavbarSearch(event) {
+            if (event.key === 'Enter') {
+                performNavbarSearch();
+            }
+        }
+        
+        function performNavbarSearch() {
+            const searchBox = document.getElementById('navbarSearchBox');
+            const query = searchBox.value.trim();
+            if (query) {
+                window.location.href = `{% url 'home' %}?search=${encodeURIComponent(query)}`;
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCart();
+            loadUserProfile();
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                const themeIcon = document.getElementById('themeIcon');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            }
+            
+            // Close user dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const userMenu = document.getElementById('userMenu');
+                const dropdown = document.getElementById('userDropdown');
+                if (userMenu && dropdown && !userMenu.contains(event.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        });
+
+        // Cross-tab synchronization - Listen for localStorage changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'radhi-cart') {
+                // Cart changed in another tab - reload cart
+                loadCart();
+                console.log('Cart updated from another tab');
+            } else if (e.key === 'radhi-wishlist') {
+                // Wishlist changed - update count
+                const wishlist = JSON.parse(e.newValue || '[]');
+                const wishlistCount = document.getElementById('wishlistCount');
+                if (wishlistCount) {
+                    wishlistCount.textContent = wishlist.length;
+                }
+                console.log('Wishlist updated from another tab');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice - {{ order.order_id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .invoice-container, .invoice-container * {
+        visibility: visible;
+    }
+    .invoice-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .no-print {
+        display: none !important;
+    }
+}
+
+.invoice-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+    background: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 3px solid #2e7d32;
+}
+
+.company-info h1 {
+    color: #2e7d32;
+    font-size: 32px;
+    margin: 0 0 10px 0;
+}
+
+.company-info p {
+    color: #6b7280;
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.invoice-info {
+    text-align: right;
+}
+
+.invoice-info h2 {
+    color: #2c3e50;
+    font-size: 28px;
+    margin: 0 0 15px 0;
+}
+
+.invoice-info p {
+    color: #6b7280;
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.invoice-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.detail-section h3 {
+    color: #2c3e50;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.detail-section p {
+    margin: 8px 0;
+    color: #374151;
+    font-size: 14px;
+}
+
+.detail-section strong {
+    color: #6b7280;
+    display: inline-block;
+    min-width: 120px;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.items-table thead {
+    background: #2e7d32;
+    color: white;
+}
+
+.items-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.items-table td {
+    padding: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #374151;
+    font-size: 14px;
+}
+
+.items-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.items-table tfoot {
+    background: #e8f5e9;
+}
+
+.items-table tfoot td {
+    padding: 20px 15px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #2e7d32;
+    border-bottom: none;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.invoice-footer {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 2px solid #e5e7eb;
+    text-align: center;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.payment-status {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.status-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.action-buttons {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #2e7d32;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1b5e20;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.btn svg {
+    width: 16px;
+    height: 16px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="invoice-container">
+    <!-- Invoice Header -->
+    <div class="invoice-header">
+        <div class="company-info">
+            <h1><i data-lucide="store"></i> Grocery Store</h1>
+            <p>123 Business Street</p>
+            <p>City, State 12345</p>
+            <p>Phone: +1 (555) 123-4567</p>
+            <p>Email: info@grocerystore.com</p>
+        </div>
+        <div class="invoice-info">
+            <h2>INVOICE</h2>
+            <p><strong>Invoice #:</strong> {{ order.order_id }}</p>
+            <p><strong>Date:</strong> {{ order.order_date|date:"d M Y" }}</p>
+            <span class="payment-status status-{{ order.payment_status|lower }}">
+                {{ order.payment_status }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Customer & Payment Details -->
+    <div class="invoice-details">
+        <div class="detail-section">
+            <h3><i data-lucide="user"></i> Bill To</h3>
+            <p><strong>Name:</strong> {{ order.customer.name }}</p>
+            <p><strong>Email:</strong> {{ order.customer.email|default:"-" }}</p>
+            <p><strong>Phone:</strong> {{ order.customer.phone|default:"-" }}</p>
+            <p><strong>Location:</strong> {{ order.customer.location|default:"-" }}</p>
+        </div>
+        <div class="detail-section">
+            <h3><i data-lucide="credit-card"></i> Payment Details</h3>
+            <p><strong>Method:</strong> {{ order.get_payment_method_display }}</p>
+            <p><strong>Transaction ID:</strong> {{ order.transaction_id|default:"N/A" }}</p>
+            <p><strong>Status:</strong> {{ order.payment_status }}</p>
+            <p><strong>Delivery Status:</strong> {{ order.get_delivery_status_display }}</p>
+        </div>
+    </div>
+
+    <!-- Order Items Table -->
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th class="text-right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.product_name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price|floatformat:2 }}</td>
+                <td class="text-right">₹{{ item.get_total_price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"><strong>Total Items: {{ total_items }}</strong></td>
+                <td class="text-right"><strong>Grand Total:</strong></td>
+                <td class="text-right"><strong>₹{{ grand_total|floatformat:2 }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- Invoice Footer -->
+    <div class="invoice-footer">
+        <p><strong>Thank you for your business!</strong></p>
+        <p>This is a computer-generated invoice and does not require a signature.</p>
+        <p>For any queries, please contact us at info@grocerystore.com</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons no-print">
+        <button onclick="window.print()" class="btn btn-primary">
+            <i data-lucide="printer"></i> Print Invoice
+        </button>
+        <a href="{% url 'order_detail' order.pk %}" class="btn btn-secondary">
+            <i data-lucide="arrow-left"></i> Back to Order
+        </a>
+        <a href="{% url 'payment_dashboard' %}" class="btn btn-secondary">
+            <i data-lucide="credit-card"></i> Payment Dashboard
+        </a>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

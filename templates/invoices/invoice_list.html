@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoices{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+  .amount-green { color: #2e7d32; font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delivery-page">
+  <div class="page-header">
+    <h2><i data-lucide="file-text"></i></i> Invoice Management</h2>
+    <a href="{% url 'tax_list' %}" class="btn-track" style="margin-left:auto;">Manage Taxes</a>
+  </div>
+
+  <!-- Summary (quick-stats like Orders page) -->
+  <div class="quick-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e8f5e9; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="files" style="color: #2e7d32;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Total Invoices</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ total_invoices }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e6f4ea; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="check-circle" style="color: #2e7d32;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Paid Invoices</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ paid_count }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #fff4d8; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="clock" style="color: #b8860b;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Pending Invoices</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ pending_count }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e3f2fd; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="indian-rupee" style="color: #1565c0;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Total Amount</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">₹{{ total_amount|floatformat:0 }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="delivery-filters">
+    <form action="{% url 'invoice_list' %}" method="get" class="filter-form">
+      <input type="text" name="search" placeholder="Search invoice no / order id / customer / txn..." value="{{ search }}">
+      <select name="status">
+        <option value="" {% if not status %}selected{% endif %}>All</option>
+        {% for key, label in status_choices %}
+          <option value="{{ key }}" {% if status == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn-track">Search</button>
+    </form>
+  </div>
+
+  <!-- Invoice cards -->
+  <div class="track-order-cards">
+    {% for inv in page_obj %}
+    <div class="track-card">
+      <div class="track-card-top">
+        <span class="order-id">#{{ inv.invoice_number }}</span>
+        {% if inv.payment_status == 'Paid' %}
+          <span class="delivery-badge" style="background:#dcfce7; color:#15803d;">Paid</span>
+        {% elif inv.payment_status == 'Pending' %}
+          <span class="delivery-badge" style="background:#fff4d8; color:#b8860b;">Pending</span>
+        {% else %}
+          <span class="delivery-badge" style="background:#fdecea; color:#c62828;">Cancelled</span>
+        {% endif %}
+      </div>
+      <div class="track-card-body">
+        <p><strong>{{ inv.customer.name }}</strong></p>
+        <p class="text-muted">Order: {{ inv.order.order_id }} · Tax: {{ inv.tax_name|default:"-" }} ({{ inv.tax_percentage }}%)</p>
+        <p><span class="amount-green">₹{{ inv.total_amount|floatformat:2 }}</span> · {{ inv.issue_date|date:"d M Y" }}</p>
+      </div>
+      <div class="track-card-footer">
+        <a href="{% url 'invoice_detail' inv.pk %}" class="btn-track">View</a>
+        <a href="{% url 'download_invoice_pdf' inv.pk %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="no-orders"><p>No invoices found.</p></div>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="pagination-bar">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}&status={{ status }}&search={{ search }}">‹ Prev</a>
+    {% endif %}
+    <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}&status={{ status }}&search={{ search }}">Next ›</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+{% endblock %}
+

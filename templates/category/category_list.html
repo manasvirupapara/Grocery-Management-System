@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Categories{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+.track-card-body img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: #f9fafb;
+    padding: 8px;
+}
+.category-actions {
+    display: flex;
+    gap: 8px;
+}
+.category-actions a {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 13px;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    background: #fff;
+}
+.category-actions a:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page">
+    <div class="page-header">
+        <h2><i data-lucide="tags"></i> Category Management</h2>
+        <a href="{% url 'add_category' %}" class="btn-track" style="margin-left: auto;">+ Add Category</a>
+    </div>
+
+    <div class="delivery-filters">
+        <form action="{% url 'category_list' %}" method="get" class="filter-form">
+            <input type="text" name="search" placeholder="Search categories..." value="{{ search }}">
+            <select name="status">
+                <option value="">All Status</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+            <button type="submit" class="btn-track">Search</button>
+        </form>
+    </div>
+
+    <div class="track-order-cards">
+        {% for category in page_obj %}
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id">{{ category.name }}</span>
+                {% if category.is_active %}
+                <span class="delivery-badge" style="background: #e8f5e9; color: #2e7d32;">Active</span>
+                {% else %}
+                <span class="delivery-badge" style="background: #ffebee; color: #c62828;">Inactive</span>
+                {% endif %}
+            </div>
+            <div class="track-card-body">
+                {% if category.image %}
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                {% else %}
+                    <div style="width: 100%; height: 150px; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #9ca3af; margin-bottom: 12px;">
+                        <i data-lucide="image"></i>
+                    </div>
+                {% endif %}
+                <p><strong>{{ category.name }}</strong></p>
+            </div>
+            <div class="track-card-footer">
+                <div class="category-actions">
+                    <a href="{% url 'edit_category' category.id %}">Edit</a>
+                    <a href="{% url 'delete_category' category.id %}">Delete</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-orders">
+            <p>No categories found.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-bar">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">‹ Prev</a>
+        {% endif %}
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next ›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

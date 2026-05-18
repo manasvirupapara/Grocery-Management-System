@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reports Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page">
+    <div class="page-header">
+        <h2><i data-lucide="file-text"></i> Reports & Analytics</h2>
+    </div>
+
+    <div class="track-order-cards">
+        <!-- Sales Report Card -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="trending-up"></i> Sales Report</span>
+                <span class="delivery-badge" style="background: #e3f2fd; color: #1565c0;">Analytics</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Comprehensive sales analysis</strong></p>
+                <p class="text-muted">Revenue, orders, and payment status breakdown</p>
+                <p>From/To date filtering · PDF download available</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'sales_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_sales_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+                
+            </div>
+        </div>
+
+        <!-- Customer Report Card -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="users"></i> Customer Report</span>
+                <span class="delivery-badge" style="background: #f3e5f5; color: #7b1fa2;">Demographics</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Customer insights and analytics</strong></p>
+                <p class="text-muted">Demographics, spending patterns, engagement metrics</p>
+                <p>Top customers · Order statistics · PDF download</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'customer_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_customer_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Inventory Report Card -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="package"></i> Inventory Report</span>
+                <span class="delivery-badge" style="background: #e8f5e9; color: #2e7d32;">Categories</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Category and inventory overview</strong></p>
+                <p class="text-muted">Active/inactive items, stock status</p>
+                <p>Category details · Status breakdown · PDF download</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'inventory_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_inventory_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Daily Sales Report -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="calendar-days"></i> Daily Sales</span>
+                <span class="delivery-badge" style="background: #e8f5e9; color: #2e7d32;">Date Range</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Daily revenue and orders</strong></p>
+                <p class="text-muted">Grouped day-wise with totals</p>
+                <p>From/To filter · PDF download</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'daily_sales_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_daily_sales_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Monthly Sales Report -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="calendar"></i> Monthly Sales</span>
+                <span class="delivery-badge" style="background: #e3f2fd; color: #1565c0;">Trend</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Monthly summary</strong></p>
+                <p class="text-muted">Grouped month-wise with totals</p>
+                <p>From/To filter · PDF download</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'monthly_sales_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_monthly_sales_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Product Wise Sales -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="package"></i> Product Wise Sales</span>
+                <span class="delivery-badge" style="background: #fff4d8; color: #b8860b;">Products</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Product performance</strong></p>
+                <p class="text-muted">Qty, revenue, COGS and profit (if cost set)</p>
+                <p>From/To filter · PDF download</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'product_wise_sales_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_product_wise_sales_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Low Stock -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="alert-triangle"></i> Low Stock</span>
+                <span class="delivery-badge" style="background: #fdecea; color: #c62828;">Inventory</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Low stock products</strong></p>
+                <p class="text-muted">Based on each product’s threshold</p>
+                <p>Date filter by product update · PDF download</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'low_stock_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_low_stock_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Customer Purchase -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="user-round"></i> Customer Purchase</span>
+                <span class="delivery-badge" style="background: #f3e5f5; color: #7b1fa2;">Customers</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Customer-wise spending</strong></p>
+                <p class="text-muted">Orders, items, total spent, last purchase</p>
+                <p>From/To filter · PDF download</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'customer_purchase_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_customer_purchase_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Profit & Loss -->
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id"><i data-lucide="line-chart"></i> Profit &amp; Loss</span>
+                <span class="delivery-badge" style="background: #e8f5e9; color: #2e7d32;">Finance</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>Revenue vs COGS</strong></p>
+                <p class="text-muted">Daily gross profit summary</p>
+                <p>From/To filter · PDF download</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'profit_loss_report' %}" class="btn-track">View Report</a>
+                <a href="{% url 'download_profit_loss_report' %}" class="btn-track" style="margin-top:8px; background:#f3f4f6; color:#374151; border:1px solid #e5e7eb;">Download PDF</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

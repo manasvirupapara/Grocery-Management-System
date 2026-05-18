@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if batch %}Edit Batch{% else %}Add Batch{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{% if batch %}Edit Batch{% else %}Add New Batch{% endif %}</h1>
+    <a href="{% url 'batch_list' %}" class="btn-secondary">
+        <i data-lucide="arrow-left"></i> Back to List
+    </a>
+</div>
+
+<div class="form-card">
+    <form method="post" class="batch-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h3>Batch Information</h3>
+            
+            <div class="form-group">
+                <label for="product">Product *</label>
+                <select name="product" id="product" required>
+                    <option value="">Select Product</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}" {% if batch and batch.product.id == product.id %}selected{% endif %}>
+                        {{ product.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="batch_number">Batch Number *</label>
+                <input type="text" name="batch_number" id="batch_number" 
+                       value="{{ batch.batch_number|default:'' }}" 
+                       placeholder="e.g., BATCH-001" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="manufacturing_date">Manufacturing Date *</label>
+                    <input type="date" name="manufacturing_date" id="manufacturing_date" 
+                           value="{{ batch.manufacturing_date|date:'Y-m-d'|default:'' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="expiry_date">Expiry Date *</label>
+                    <input type="date" name="expiry_date" id="expiry_date" 
+                           value="{{ batch.expiry_date|date:'Y-m-d'|default:'' }}" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Inventory Details</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="quantity">Quantity *</label>
+                    <input type="number" name="quantity" id="quantity" 
+                           value="{{ batch.quantity|default:'' }}" 
+                           placeholder="e.g., 100" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cost_price">Cost Price (Optional)</label>
+                    <input type="number" name="cost_price" id="cost_price" 
+                           value="{{ batch.cost_price|default:'' }}" 
+                           placeholder="e.g., 50.00" step="0.01" min="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                <i data-lucide="save"></i> 
+                {% if batch %}Update Batch{% else %}Create Batch{% endif %}
+            </button>
+            <a href="{% url 'batch_list' %}" class="btn-cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    color: #333;
+    margin: 0;
+}
+
+.btn-secondary {
+    background: #757575;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+
+.btn-secondary:hover {
+    background: #616161;
+}
+
+.form-card {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 800px;
+}
+
+.batch-form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-section h3 {
+    font-size: 18px;
+    color: #333;
+    margin: 0 0 12px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f5f5f5;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #43a047;
+    box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 2px solid #f5f5f5;
+}
+
+.btn-primary {
+    background: #43a047;
+    color: white;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background: #2e7d32;
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background: #f5f5f5;
+    color: #666;
+    padding: 12px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+    lucide.createIcons();
+</script>
+{% endblock %}

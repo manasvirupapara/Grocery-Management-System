@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Category{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+.form-page {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.form-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-weight: 500;
+    font-size: 14px;
+}
+.form-group input[type="text"],
+.form-group input[type="file"],
+.form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+}
+.form-group input[type="file"] {
+    padding: 8px;
+}
+.image-preview {
+    width: 100%;
+    height: 150px;
+    border: 2px dashed #e5e7eb;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    margin-bottom: 12px;
+}
+.image-preview img {
+    max-width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+.form-actions button,
+.form-actions a {
+    flex: 1;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+.form-actions button {
+    background: #2e7d32;
+    color: white;
+}
+.form-actions button:hover {
+    background: #1b5e20;
+}
+.form-actions a {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+.form-actions a:hover {
+    background: #e5e7eb;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page form-page">
+    <div class="page-header">
+        <h2><i data-lucide="plus-circle"></i> Add Category</h2>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Category Name -->
+            <div class="form-group">
+                <label>Category Name</label>
+                <input type="text" name="name" placeholder="Enter category name" required>
+                {% if form.name.errors %}
+                    <div style="color: #dc2626; font-size: 13px; margin-top: 4px;">
+                        {{ form.name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Category Image -->
+            <div class="form-group">
+                <label>Category Image</label>
+                <input type="file" name="image" accept="image/*">
+                <div class="image-preview empty">
+                    <i data-lucide="image"></i>
+                    <p style="margin-top: 8px; font-size: 13px;">No image selected</p>
+                </div>
+            </div>
+
+            <!-- Active/Inactive Status -->
+            <div class="form-group">
+                <label>Status</label>
+                <select name="is_active">
+                    <option value="True" selected>Active</option>
+                    <option value="False">Inactive</option>
+                </select>
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-actions">
+                <button type="submit">Save Category</button>
+                <a href="{% url 'category_list' %}">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+<script>
+// Image preview
+document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.querySelector('.image-preview');
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+
+{% endblock %}

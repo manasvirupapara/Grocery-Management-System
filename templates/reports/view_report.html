@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ report_title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+  .report-wrap { max-width: 1200px; margin: 0 auto; }
+  .report-head { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+  .report-head h2 { margin:0; color:#2e7d32; display:flex; align-items:center; gap:10px; }
+  .report-sub { color:#6b7280; margin:6px 0 0 0; font-size:14px; }
+  .report-actions { display:flex; gap:10px; flex-wrap:wrap; }
+  .btn-green { background:#2e7d32; color:#fff; border:none; }
+  .btn-green:hover { background:#1b5e20; }
+  .btn-gray { background:#f3f4f6; color:#374151; border:1px solid #e5e7eb; }
+  .btn-gray:hover { background:#e5e7eb; }
+
+  .filters-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:16px; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin:16px 0; }
+  .filters-form { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
+  .filters-form label { font-size:12px; font-weight:600; color:#374151; }
+  .filters-form input { padding:10px 12px; border-radius:10px; border:1px solid #e5e7eb; min-width:170px; }
+  .filters-form .field { display:flex; flex-direction:column; gap:6px; }
+
+  .table-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:0; box-shadow:0 2px 12px rgba(0,0,0,0.06); overflow:hidden; }
+  table.report-table { width:100%; border-collapse:collapse; }
+  .report-table thead { background:#e8f5e9; }
+  .report-table th { text-align:left; padding:12px 14px; font-size:13px; color:#1b5e20; border-bottom:1px solid #d1d5db; }
+  .report-table td { padding:12px 14px; font-size:14px; color:#374151; border-bottom:1px solid #f3f4f6; }
+  .report-table tbody tr:hover { background:#f9fafb; }
+
+  .totals { padding:14px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; background:#f9fafb; }
+  .total-pill { background:#fff; border:1px solid #e5e7eb; border-radius:999px; padding:10px 14px; font-weight:600; color:#2e7d32; }
+  .muted { color:#6b7280; font-weight:500; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delivery-page report-wrap">
+  <div class="report-head">
+    <div>
+      <h2><i data-lucide="bar-chart-3"></i> {{ report_title }}</h2>
+      <p class="report-sub">{{ report_subtitle|default:"Filter by date range, view data, and download as PDF." }}</p>
+    </div>
+    <div class="report-actions">
+      <a href="{% url 'reports_dashboard' %}" class="btn-gray" style="padding:10px 14px; border-radius:10px; text-decoration:none;">Back</a>
+      <a href="{{ download_url }}" class="btn-green" style="padding:10px 14px; border-radius:10px; text-decoration:none;">Download PDF</a>
+    </div>
+  </div>
+
+  <div class="filters-card">
+    <form method="get" class="filters-form">
+      <div class="field">
+        <label>From date</label>
+        <input type="date" name="from_date" value="{{ from_date }}">
+      </div>
+      <div class="field">
+        <label>To date</label>
+        <input type="date" name="to_date" value="{{ to_date }}">
+      </div>
+      {% if extra_filters %}
+        {{ extra_filters|safe }}
+      {% endif %}
+      <button type="submit" class="btn-green" style="padding:10px 14px; border-radius:10px;">View</button>
+    </form>
+  </div>
+
+  <div class="table-card">
+    <table class="report-table">
+      <thead>
+        <tr>
+          {% for col in columns %}
+            <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            {% for cell in row %}
+              <td>{{ cell }}</td>
+            {% endfor %}
+          </tr>
+        {% empty %}
+          <tr><td colspan="{{ columns|length }}" class="muted" style="padding:18px;">No data found for selected range.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if totals %}
+      <div class="totals">
+        {% for label, value in totals %}
+          <div class="total-pill"><span class="muted">{{ label }}:</span> {{ value }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+{% endblock %}
+

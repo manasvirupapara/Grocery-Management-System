@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Order{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+.form-page {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.form-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-weight: 500;
+    font-size: 14px;
+}
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+}
+.form-group input:disabled {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+.total-info {
+    background: #e8f5e9;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #c8e6c9;
+}
+.total-info p {
+    margin: 4px 0;
+    color: #2e7d32;
+    font-size: 14px;
+}
+.total-info strong {
+    display: inline-block;
+    min-width: 120px;
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+.form-actions button,
+.form-actions a {
+    flex: 1;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+.form-actions button {
+    background: #2e7d32;
+    color: white;
+}
+.form-actions button:hover {
+    background: #1b5e20;
+}
+.form-actions a {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+.form-actions a:hover {
+    background: #e5e7eb;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page form-page">
+    <div class="page-header">
+        <h2><i data-lucide="edit"></i> Edit Order #{{ order.order_id }}</h2>
+    </div>
+
+    <div class="form-card">
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Order ID (Read Only) -->
+            <div class="form-group">
+                <label>Order ID</label>
+                <input type="text" value="{{ order.order_id }}" disabled>
+            </div>
+
+            <!-- Customer -->
+            <div class="form-group">
+                <label>Customer</label>
+                <select name="customer" required>
+                    {% for customer in customers %}
+                        <option value="{{ customer.id }}"
+                            {% if customer.id == order.customer.id %}selected{% endif %}>
+                            {{ customer.name }} ({{ customer.phone }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select name="payment_method">
+                    <option value="COD" {% if order.payment_method == 'COD' %}selected{% endif %}>Cash On Delivery</option>
+                    <option value="UPI" {% if order.payment_method == 'UPI' %}selected{% endif %}>UPI</option>
+                    <option value="Card" {% if order.payment_method == 'Card' %}selected{% endif %}>Card</option>
+                    <option value="NetBanking" {% if order.payment_method == 'NetBanking' %}selected{% endif %}>Net Banking</option>
+                </select>
+            </div>
+
+            <!-- Payment Status -->
+            <div class="form-group">
+                <label>Payment Status</label>
+                <select name="payment_status">
+                    <option value="Success" {% if order.payment_status == 'Success' %}selected{% endif %}>Success</option>
+                    <option value="Pending" {% if order.payment_status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Cancelled" {% if order.payment_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+
+            <!-- Total Info (Display Only) -->
+            <div class="total-info">
+                <p><strong>Total Items:</strong> {{ order.total_items }}</p>
+                {% if has_invoice %}
+                <p><strong>Subtotal:</strong> ₹ {{ subtotal|floatformat:2 }}</p>
+                {% if discount > 0 %}
+                <p><strong>Discount:</strong> - ₹ {{ discount|floatformat:2 }}</p>
+                {% endif %}
+                {% if tax_amount > 0 %}
+                <p><strong>Tax ({{ tax_percentage }}%):</strong> ₹ {{ tax_amount|floatformat:2 }}</p>
+                {% endif %}
+                {% endif %}
+                <p><strong>Total Amount:</strong> ₹ {{ order.grand_total|floatformat:2 }}</p>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Update Order</button>
+                <a href="{% url 'order_detail' order.id %}">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

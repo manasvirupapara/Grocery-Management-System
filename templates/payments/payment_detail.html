@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Details - {{ order.order_id }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+  .detail-page { max-width: 1100px; }
+  .soft-btn { background:#f3f4f6; color:#374151; border:1px solid #e5e7eb; }
+  .soft-btn:hover { background:#e5e7eb; color:#374151; }
+  @media print { .noPrint { display:none !important; } }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="delivery-page detail-page">
+  <div class="page-header">
+    <h2><i data-lucide="credit-card"></i> Payment Details</h2>
+    <div class="noPrint" style="display:flex; gap:10px; flex-wrap:wrap; margin-left:auto;">
+      <a href="{% url 'payment_dashboard' %}" class="btn-track soft-btn">Back</a>
+      <a href="{% url 'generate_invoice' order.pk %}" class="btn-track soft-btn">View Invoice</a>
+      <button type="button" class="btn-track" onclick="window.print()">Print</button>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px; color:#6b7280; font-size:14px;">
+    Order: <strong>#{{ order.order_id }}</strong> · Date: {{ order.order_date|date:"d M Y" }}
+  </div>
+
+  <!-- Quick stats (same style as Orders page cards) -->
+  <div class="quick-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e8f5e9; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="indian-rupee" style="color: #2e7d32;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Total Amount</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">₹{{ grand_total|floatformat:0 }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e3f2fd; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="package" style="color: #1565c0;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Total Items</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ total_items }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #fff4d8; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="info" style="color: #b8860b;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Payment Status</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ order.payment_status }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #f3e5f5; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="credit-card" style="color: #7b1fa2;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Payment Method</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ order.get_payment_method_display }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if order.payment_status == 'Pending' %}
+  <div class="track-details-card noPrint" style="margin-bottom: 20px;">
+    <h3><i data-lucide="shield-check"></i> Actions</h3>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <button type="button" class="btn-track" onclick="updateStatus('Success')">Mark as Success</button>
+      <button type="button" class="btn-track soft-btn" onclick="updateStatus('Cancelled')">Cancel Payment</button>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="track-layout">
+    <div class="track-details-card">
+      <h3><i data-lucide="receipt"></i> Transaction</h3>
+      <p><strong>Transaction ID:</strong> {{ order.transaction_id|default:"N/A" }}</p>
+      <p><strong>Payment Date:</strong> {{ order.order_date|date:"d M Y" }}</p>
+      <p><strong>Status:</strong>
+        {% if order.payment_status == 'Success' %}
+          <span style="background: #e6f4ea; color: #2e7d32; padding: 4px 10px; border-radius: 12px; font-size: 12px;">Completed</span>
+        {% elif order.payment_status == 'Pending' %}
+          <span style="background: #fff4d8; color: #b8860b; padding: 4px 10px; border-radius: 12px; font-size: 12px;">Pending</span>
+        {% else %}
+          <span style="background: #fdecea; color: #c62828; padding: 4px 10px; border-radius: 12px; font-size: 12px;">Failed</span>
+        {% endif %}
+      </p>
+    </div>
+
+    <div class="track-details-card">
+      <h3><i data-lucide="user"></i> Customer</h3>
+      <p><strong>Name:</strong> {{ order.customer.name }}</p>
+      <p><strong>Email:</strong> {{ order.customer.email|default:"-" }}</p>
+      <p><strong>Phone:</strong> {{ order.customer.phone|default:"-" }}</p>
+      <p><strong>Location:</strong> {{ order.customer.location|default:"-" }}</p>
+    </div>
+  </div>
+
+  <div class="track-details-card" style="margin-top:20px;">
+    <h3><i data-lucide="package"></i> Order Items</h3>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">Product</th>
+            <th style="text-align:right; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">Qty</th>
+            <th style="text-align:right; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">Unit Price</th>
+            <th style="text-align:right; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6;">{{ item.product_name }}</td>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6; text-align:right;">{{ item.quantity }}</td>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6; text-align:right;">₹{{ item.price|floatformat:2 }}</td>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6; text-align:right;"><strong>₹{{ item.get_total_price|floatformat:2 }}</strong></td>
+          </tr>
+          {% endfor %}
+          {% if has_invoice %}
+          <tr style="background: #f9fafb;">
+            <td colspan="3" style="padding:12px; text-align:right;"><strong>Subtotal</strong></td>
+            <td style="padding:12px; text-align:right;"><strong>₹{{ subtotal|floatformat:2 }}</strong></td>
+          </tr>
+          {% if discount > 0 %}
+          <tr style="background: #f9fafb;">
+            <td colspan="3" style="padding:12px; text-align:right;"><strong>Discount</strong></td>
+            <td style="padding:12px; text-align:right;"><strong>- ₹{{ discount|floatformat:2 }}</strong></td>
+          </tr>
+          {% endif %}
+          {% if tax_amount > 0 %}
+          <tr style="background: #f9fafb;">
+            <td colspan="3" style="padding:12px; text-align:right;"><strong>Tax ({{ tax_percentage }}%)</strong></td>
+            <td style="padding:12px; text-align:right;"><strong>₹{{ tax_amount|floatformat:2 }}</strong></td>
+          </tr>
+          {% endif %}
+          {% endif %}
+          <tr>
+            <td colspan="3" style="padding:12px; text-align:right; border-top:2px solid #e5e7eb;"><strong>Grand Total</strong></td>
+            <td style="padding:12px; text-align:right; border-top:2px solid #e5e7eb;"><strong>₹{{ grand_total|floatformat:2 }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+<script>
+function updateStatus(status) {
+  if (!confirm('Are you sure you want to update the payment status to ' + status + '?')) return;
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+  fetch("{% url 'update_payment_status' order.pk %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrftoken
+    },
+    body: JSON.stringify({ status: status })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) location.reload();
+    else alert(data.error || 'Failed to update payment status');
+  })
+  .catch(() => alert('Failed to update payment status'));
+}
+</script>
+
+{% endblock %}
+

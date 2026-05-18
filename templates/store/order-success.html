@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success - Radhi Fresh Mart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 30px;
+            padding: 60px 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease 0.2s both;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-icon i {
+            font-size: 60px;
+            color: white;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .order-id {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .order-id strong {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .message {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .order-details {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .order-details h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #28a745;
+            border: 2px solid #28a745;
+        }
+
+        .btn-secondary:hover {
+            background: #28a745;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Loading order details...</p>
+        </div>
+
+        <div id="successState" style="display: none;">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            
+            <h1>Order Placed Successfully!</h1>
+            <p class="order-id">Order ID: <strong id="orderId"></strong></p>
+            
+            <p class="message">
+                Thank you for your order! We've received your order and will start processing it soon. 
+                You'll receive a confirmation email shortly.
+            </p>
+            
+            <div class="order-details">
+                <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Customer Name:</span>
+                    <span class="detail-value" id="customerName">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Total Items:</span>
+                    <span class="detail-value" id="totalItems">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Total Amount:</span>
+                    <span class="detail-value" id="totalAmount">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Payment Method:</span>
+                    <span class="detail-value" id="paymentMethod">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Delivery Status:</span>
+                    <span class="detail-value" id="deliveryStatus">Order Placed</span>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <a href="radhi.html" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="radhi-shop.html" class="btn btn-secondary">
+                    <i class="fas fa-shopping-bag"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get order ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order_id');
+
+        if (!orderId) {
+            document.getElementById('loadingState').innerHTML = `
+                <div class="success-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <i class="fas fa-times"></i>
+                </div>
+                <h1 style="color: #ef4444;">No Order Found</h1>
+                <p class="message">Invalid order ID. Please check your order confirmation.</p>
+                <a href="radhi.html" class="btn btn-primary">Back to Home</a>
+            `;
+        } else {
+            loadOrderDetails(orderId);
+        }
+
+        async function loadOrderDetails(orderId) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/orders/${orderId}/`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load order details');
+                }
+                
+                const order = await response.json();
+                
+                // Update UI with order details
+                document.getElementById('orderId').textContent = order.order_id;
+                document.getElementById('customerName').textContent = order.customer_name;
+                document.getElementById('totalItems').textContent = order.total_items;
+                document.getElementById('totalAmount').textContent = `₹${order.total_amount}`;
+                document.getElementById('paymentMethod').textContent = order.payment_method;
+                document.getElementById('deliveryStatus').textContent = order.delivery_status.replace('_', ' ');
+                
+                // Show success state
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('successState').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading order:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="success-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h1 style="color: #f59e0b;">Order Placed!</h1>
+                    <p class="order-id">Order ID: <strong>${orderId}</strong></p>
+                    <p class="message">Your order has been placed successfully, but we couldn't load the details right now. Please check your email for confirmation.</p>
+                    <a href="radhi.html" class="btn btn-primary">Back to Home</a>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

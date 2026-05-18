@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Order #{{ order.order_id }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="track-page">
+    <div class="track-header">
+        <a href="{% url 'delivery_list' %}" class="back-link">‹ Back to Delivery</a>
+        <h2>Track your order</h2>
+        <p class="order-id-large">Order #{{ order.order_id }}</p>
+    </div>
+
+    <div class="track-layout">
+        <!-- LEFT: Timeline (Amazon style) -->
+        <div class="track-timeline-card">
+            <h3>Delivery progress</h3>
+            <div class="timeline">
+                {% for value, label, icon in stages %}
+                <div class="timeline-step {% if forloop.counter0 <= current_index %}done{% endif %} {% if forloop.counter0 == current_index %}current{% endif %}">
+                    <div class="timeline-icon">
+                        <i data-lucide="{{ icon }}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <strong>{{ label }}</strong>
+                        {% if forloop.counter0 < current_index %}
+                        <span class="timeline-done-label">Completed</span>
+                        {% elif forloop.counter0 == current_index %}
+                        <span class="timeline-current-label">Current</span>
+                        {% endif %}
+                    </div>
+                    {% if not forloop.last %}
+                    <div class="timeline-connector"></div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="update-status-box">
+                <p><strong>Update status</strong></p>
+                <form action="{% url 'update_delivery_status' order.pk %}" method="post">
+                    {% csrf_token %}
+                    <select name="delivery_status" class="status-select">
+                        {% for value, label in delivery_choices %}
+                        <option value="{{ value }}" {% if order.delivery_status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn-update">Update</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT: Order details -->
+        <div class="track-details-card">
+            <h3>Order details</h3>
+            <div class="detail-row">
+                <span class="label">Placed on</span>
+                <span>{{ order.order_date|date:"d M Y" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Customer</span>
+                <span>{{ order.customer.name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Phone</span>
+                <span>{{ order.customer.phone }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Delivery address</span>
+                <span>{{ order.customer.location|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Payment</span>
+                <span>{{ order.get_payment_method_display }} · {{ order.payment_status }}</span>
+            </div>
+
+            <hr class="detail-divider">
+
+            <h4>Items ({{ items.count }})</h4>
+            <ul class="track-items-list">
+                {% for item in items %}
+                <li>
+                    <span>{{ item.product_name }}</span>
+                    <span>× {{ item.quantity }}</span>
+                    <span>₹ {{ item.get_total_price }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% if has_invoice %}
+            <div style="padding: 8px 0; border-top: 1px solid #e5e7eb; margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px;">
+                    <span>Subtotal</span>
+                    <span>₹ {{ subtotal|floatformat:2 }}</span>
+                </div>
+                {% if discount > 0 %}
+                <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px;">
+                    <span>Discount</span>
+                    <span>- ₹ {{ discount|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if tax_amount > 0 %}
+                <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px;">
+                    <span>Tax ({{ tax_percentage }}%)</span>
+                    <span>₹ {{ tax_amount|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            <div class="grand-total">
+                <strong>Total</strong>
+                <strong>₹ {{ grand_total|floatformat:2 }}</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

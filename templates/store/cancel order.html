@@ -1,0 +1,575 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Order - The Daily Grocer</title>
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            padding: 0;
+            margin: 0;
+        }
+
+        .cancel-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .cancel-header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .cancel-header i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .cancel-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .cancel-body {
+            padding: 40px;
+        }
+
+        .order-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .order-info h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+
+        .info-value {
+            color: #1f2937;
+        }
+
+        .cancel-reason {
+            margin-bottom: 30px;
+        }
+
+        .cancel-reason label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .cancel-reason select,
+        .cancel-reason textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .cancel-reason select:focus,
+        .cancel-reason textarea:focus {
+            outline: none;
+            border-color: #28a745;
+        }
+
+        .cancel-reason textarea {
+            resize: vertical;
+            min-height: 100px;
+            margin-top: 15px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+
+        .warning-box i {
+            color: #ffc107;
+            margin-right: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #6c757d;
+            border: 2px solid #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #6c757d;
+            color: white;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-message i {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .success-message h2 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .success-message p {
+            color: #6c757d;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .cancel-container {
+                margin: 20px;
+            }
+
+            .cancel-body {
+                padding: 25px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-main">
+            <div class="container">
+                <div class="header-content" style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+                    <div class="logo" onclick="window.location.href='{% url 'home' %}'" style="cursor: pointer; flex-shrink: 0;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="logo-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="logo-text">
+                                <h1 style="white-space: nowrap;">The Daily Grocer</h1>
+                                <span>Premium Grocery Store</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="main-nav" style="flex-shrink: 0;">
+                        <ul>
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'shop' %}">Shop</a></li>
+                            <li><a href="{% url 'about' %}">About</a></li>
+                            <li><a href="{% url 'contact' %}">Contact</a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="navbar-search" style="flex: 1; max-width: 400px;">
+                        <input type="text" id="navbarSearchBox" placeholder="Search for products..." onkeypress="handleNavbarSearch(event)">
+                        <button class="navbar-search-btn" onclick="performNavbarSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="header-actions" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
+                        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </div>
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-icon" onclick="toggleUserDropdown()">
+                                <img id="navbarProfilePic" src="" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #28a745;">
+                                <i class="fas fa-user" id="navbarUserIcon"></i>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <div class="user-info" id="userInfo"></div>
+                                <ul class="user-menu-list" id="userMenuList"></ul>
+                            </div>
+                        </div>
+                        <div class="wishlist-icon" onclick="window.location.href=&quot;{% url 'wishlist' %}&quot;" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-heart"></i>
+                            <span class="count" id="wishlistCount" style="position: absolute; top: -8px; right: -8px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                        <div class="cart-icon" onclick="window.location.href=&quot;{% url 'cart' %}&quot;" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="count" id="cartCount" style="position: absolute; top: -8px; right: -8px; background: #28a745; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="cancel-container">
+        <div class="cancel-header">
+            <i class="fas fa-times-circle"></i>
+            <h1>Cancel Order</h1>
+            <p>We're sorry to see you cancel your order</p>
+        </div>
+
+        <div class="cancel-body" id="cancelForm">
+            <div class="order-info">
+                <h3><i class="fas fa-receipt"></i> Order Details</h3>
+                <div class="info-row">
+                    <span class="info-label">Order ID:</span>
+                    <span class="info-value" id="displayOrderId">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Order Date:</span>
+                    <span class="info-value" id="displayOrderDate">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Total Amount:</span>
+                    <span class="info-value" id="displayOrderTotal">₹0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Payment Method:</span>
+                    <span class="info-value" id="displayPaymentMethod">-</span>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Important:</strong> Once cancelled, this order cannot be restored. Refund will be processed within 5-7 business days for prepaid orders.
+            </div>
+
+            <div class="cancel-reason">
+                <label for="cancelReason">
+                    <i class="fas fa-comment-dots"></i> Why are you cancelling this order? *
+                </label>
+                <select id="cancelReason" required>
+                    <option value="">Select a reason</option>
+                    <option value="changed_mind">Changed my mind</option>
+                    <option value="wrong_items">Ordered wrong items</option>
+                    <option value="found_better_price">Found better price elsewhere</option>
+                    <option value="delivery_delay">Delivery taking too long</option>
+                    <option value="payment_issue">Payment issue</option>
+                    <option value="duplicate_order">Duplicate order</option>
+                    <option value="other">Other reason</option>
+                </select>
+                <textarea id="cancelComments" placeholder="Additional comments (optional)"></textarea>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-danger" onclick="confirmCancellation()">
+                    <i class="fas fa-times-circle"></i> Confirm Cancellation
+                </button>
+                <a href="radhi-invoice.html" class="btn btn-secondary" id="backToInvoice">
+                    <i class="fas fa-arrow-left"></i> Go Back
+                </a>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <i class="fas fa-check-circle"></i>
+            <h2>Order Cancelled Successfully</h2>
+            <p>Your order has been cancelled. Refund will be processed within 5-7 business days.</p>
+            <p><strong>Cancellation ID:</strong> <span id="cancellationId"></span></p>
+            <div class="action-buttons">
+                <a href="{% url 'home' %}" class="btn btn-secondary">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+
+        function loadOrderData() {
+            if (!orderId) {
+                alert('❌ No order ID provided!');
+                window.location.href = '{% url "home" %}';
+                return;
+            }
+
+            // Update back button link
+            document.getElementById('backToInvoice').href = `{% url "invoice" %}?orderId=${orderId}`;
+
+            // Load order data from localStorage
+            const deliveryData = JSON.parse(localStorage.getItem('radhi-delivery-data'));
+            
+            if (!deliveryData || deliveryData.orderId !== orderId) {
+                alert('❌ Order not found!');
+                window.location.href = '{% url "home" %}';
+                return;
+            }
+
+            // Display order information
+            document.getElementById('displayOrderId').textContent = orderId;
+            document.getElementById('displayOrderDate').textContent = new Date(deliveryData.orderDate).toLocaleDateString('en-IN');
+            document.getElementById('displayOrderTotal').textContent = `₹${deliveryData.total.toFixed(2)}`;
+            
+            const paymentMethod = deliveryData.paymentMethod === 'upi' ? 'UPI Payment' : 
+                                 deliveryData.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Card Payment';
+            document.getElementById('displayPaymentMethod').textContent = paymentMethod;
+        }
+
+        function confirmCancellation() {
+            const reason = document.getElementById('cancelReason').value;
+            const comments = document.getElementById('cancelComments').value;
+
+            if (!reason) {
+                alert('⚠️ Please select a cancellation reason');
+                return;
+            }
+
+            if (confirm('⚠️ Are you absolutely sure you want to cancel this order?\n\nThis action cannot be undone.')) {
+                // Generate cancellation ID
+                const cancellationId = 'CAN' + Date.now().toString().slice(-8);
+                
+                // Save cancellation data
+                const cancellationData = {
+                    orderId: orderId,
+                    cancellationId: cancellationId,
+                    reason: reason,
+                    comments: comments,
+                    cancelledAt: new Date().toISOString(),
+                    status: 'cancelled'
+                };
+
+                // Store cancellation data
+                localStorage.setItem(`cancellation-${orderId}`, JSON.stringify(cancellationData));
+
+                // Update order status
+                const deliveryData = JSON.parse(localStorage.getItem('radhi-delivery-data'));
+                if (deliveryData) {
+                    deliveryData.status = 'cancelled';
+                    deliveryData.cancellationData = cancellationData;
+                    localStorage.setItem('radhi-delivery-data', JSON.stringify(deliveryData));
+                }
+
+                // Show success message
+                document.getElementById('cancelForm').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('cancellationId').textContent = cancellationId;
+
+                console.log('Order cancelled:', cancellationData);
+            }
+        }
+
+        // Navbar search functions
+        function handleNavbarSearch(event) {
+            if (event.key === 'Enter') {
+                performNavbarSearch();
+            }
+        }
+        
+        function performNavbarSearch() {
+            const searchBox = document.getElementById('navbarSearchBox');
+            const query = searchBox.value.trim();
+            if (query) {
+                window.location.href = `{% url 'home' %}?search=${encodeURIComponent(query)}`;
+            }
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const themeIcon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // User dropdown toggle
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+
+        // Load user profile
+        function loadUserProfile() {
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || '{}');
+            const userInfo = document.getElementById('userInfo');
+            const userMenuList = document.getElementById('userMenuList');
+            const navbarProfilePic = document.getElementById('navbarProfilePic');
+            const navbarUserIcon = document.getElementById('navbarUserIcon');
+            
+            if (user.loggedIn) {
+                // Show avatar in navbar
+                const firstLetter = (user.name || 'U').charAt(0).toUpperCase();
+                const canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+                
+                // Solid green background
+                ctx.fillStyle = '#28a745';
+                ctx.fillRect(0, 0, 100, 100);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 50px Poppins, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(firstLetter, 50, 50);
+                
+                navbarProfilePic.src = canvas.toDataURL();
+                navbarProfilePic.style.display = 'block';
+                navbarUserIcon.style.display = 'none';
+                
+                // User logged in
+                userInfo.innerHTML = `
+                    <div class="user-greeting">Hello!</div>
+                    <div class="user-name">${user.name || 'User'}</div>
+                    <div class="user-email">${user.email || ''}</div>
+                `;
+                
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                    <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                    <li><a href="{% url 'addresses' %}"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                    <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                `;
+            } else {
+                // Show default icon
+                navbarProfilePic.style.display = 'none';
+                navbarUserIcon.style.display = 'block';
+                
+                // Guest user
+                userInfo.innerHTML = `
+                    <div class="user-greeting">Welcome!</div>
+                    <div class="user-name">Guest User</div>
+                `;
+                
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'auth' %}"><i class="fas fa-sign-in-alt"></i> Login / Register</a></li>
+                    <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Cart</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                `;
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('radhi-user');
+                const cartCountEl = document.getElementById('cartCount');
+                const wishlistCountEl = document.getElementById('wishlistCount');
+                if (cartCountEl) cartCountEl.textContent = '0';
+                if (wishlistCountEl) wishlistCountEl.textContent = '0';
+                alert('✅ Logged out successfully!');
+                window.location.href = '{% url "home" %}';
+            }
+        }
+
+        // Update cart and wishlist counts
+        function updateCounts() {
+            const cart = JSON.parse(localStorage.getItem('radhi-cart')) || [];
+            const wishlist = JSON.parse(localStorage.getItem('radhi-wishlist')) || [];
+            
+            const cartCount = document.getElementById('cartCount');
+            const wishlistCount = document.getElementById('wishlistCount');
+            
+            if (cartCount) cartCount.textContent = cart.length;
+            if (wishlistCount) wishlistCount.textContent = wishlist.length;
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadUserProfile();
+            loadOrderData();
+            updateCounts();
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                const themeIcon = document.getElementById('themeIcon');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.user-menu')) {
+                const dropdown = document.getElementById('userDropdown');
+                if (dropdown) dropdown.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

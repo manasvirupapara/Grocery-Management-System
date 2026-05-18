@@ -1,0 +1,628 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - The Daily Grocer</title>
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #28a745 0%, #28a745 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #28a745, #28a745);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .logo-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            background: linear-gradient(135deg, #28a745, #28a745);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text span {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #28a745, #28a745);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .hero-section {
+            padding: 80px 0;
+            text-align: center;
+            background: white;
+        }
+
+        .hero-section h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            margin-bottom: 20px;
+            color: #28a745;
+        }
+
+        .hero-section p {
+            font-size: 20px;
+            color: #28a745;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 0;
+            padding: 60px;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 60px;
+        }
+
+        .about-text h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            background: linear-gradient(135deg, #28a745, #28a745);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+        }
+
+        .about-text p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .about-image {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 40px 30px;
+            border-radius: 20px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #28a745, #28a745);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 36px;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 60px;
+            padding: 50px;
+            background: linear-gradient(135deg, #28a745, #28a745);
+            border-radius: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .team-section {
+            margin-top: 60px;
+        }
+
+        .team-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            text-align: center;
+            background: linear-gradient(135deg, #28a745, #28a745);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 50px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .team-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: 20px;
+            background: #f9f9f9;
+            transition: 0.3s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+
+        .team-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #28a745, #28a745);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+
+        .team-card h4 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .team-card p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        @media (max-width: 968px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-main">
+            <div class="container">
+                <div class="header-content" style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+                    <div class="logo" style="cursor: pointer; flex-shrink: 0;" onclick="window.location.href='{% url 'home' %}'">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="logo-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="logo-text">
+                                <h1 style="white-space: nowrap;">The Daily Grocer</h1>
+                                <span>Premium Grocery Store</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="main-nav" style="flex-shrink: 0;">
+                        <ul>
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'shop' %}">Shop</a></li>
+                            <li><a href="{% url 'about' %}" class="active">About</a></li>
+                            <li><a href="{% url 'contact' %}">Contact</a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="navbar-search" style="flex: 1; max-width: 400px;">
+                        <input type="text" id="navbarSearchBox" placeholder="Search for products..." onkeypress="handleNavbarSearch(event)">
+                        <button class="navbar-search-btn" onclick="performNavbarSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="header-actions" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
+                        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </div>
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-icon" onclick="toggleUserDropdown()">
+                                <img id="navbarProfilePic" src="" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #28a745;">
+                                <i class="fas fa-user" id="navbarUserIcon"></i>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <div class="user-info" id="userInfo"></div>
+                                <ul class="user-menu-list" id="userMenuList"></ul>
+                            </div>
+                        </div>
+                        <div class="wishlist-icon" onclick="window.location.href='{% url 'wishlist' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-heart"></i>
+                            <span class="count" id="wishlistCount" style="position: absolute; top: -8px; right: -8px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                        <div class="cart-icon" onclick="window.location.href='{% url 'cart' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="count" id="cartCount" style="position: absolute; top: -8px; right: -8px; background: #28a745; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+<div class="hero-section">
+    <div class="container">
+        <h1>The Daily Grocer
+        </h1>
+        <p>Your trusted partner for fresh, organic groceries</p>
+    </div>
+</div>
+
+<div class="content-section">
+    <div class="about-grid">
+        <div class="about-text">
+            <h2>Our Story</h2>
+            <p>Founded in 2020, The Daily Grocer  started with a simple mission: to bring farm-fresh, organic produce directly to your doorstep. We believe that everyone deserves access to healthy, high-quality groceries without compromising on convenience.</p>
+            <p>Today, we serve thousands of happy customers across the city, delivering fresh vegetables, fruits, dairy products, and more. Our commitment to quality and customer satisfaction has made us one of the most trusted names in online grocery shopping.</p>
+            <p>We work directly with local farmers and trusted suppliers to ensure that every product meets our strict quality standards. From farm to your table, we maintain the freshness and nutritional value of every item.</p>
+        </div>
+        <div class="about-image">
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=600&fit=crop" alt="Fresh Groceries">
+        </div>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <h3>100% Organic</h3>
+            <p>All our products are certified organic and free from harmful chemicals and pesticides.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-truck"></i>
+            </div>
+            <h3>Fast Delivery</h3>
+            <p>Same-day delivery available. Get your groceries delivered within hours of ordering.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Quality Assured</h3>
+            <p>Every product goes through rigorous quality checks before reaching you.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-hand-holding-heart"></i>
+            </div>
+            <h3>Farm Fresh</h3>
+            <p>Direct from farms to your home, ensuring maximum freshness and nutrition.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-tags"></i>
+            </div>
+            <h3>Best Prices</h3>
+            <p>Competitive pricing with regular deals and discounts on your favorite products.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-headset"></i>
+            </div>
+            <h3>24/7 Support</h3>
+            <p>Our customer support team is always ready to help you with any queries.</p>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="stat-card">
+            <div class="stat-number">50K+</div>
+            <div class="stat-label">Happy Customers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">100+</div>
+            <div class="stat-label">Local Farmers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">4.9★</div>
+            <div class="stat-label">Customer Rating</div>
+        </div>
+    </div>
+
+    <div class="team-section">
+        <h2>Meet Our Team</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-img">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4>Rajesh Kumar</h4>
+                <p>Founder & CEO</p>
+            </div>
+            <div class="team-card">
+                <div class="team-img">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4>Priya Sharma</h4>
+                <p>Operations Head</p>
+            </div>
+            <div class="team-card">
+                <div class="team-img">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4>Amit Patel</h4>
+                <p>Quality Manager</p>
+            </div>
+            <div class="team-card">
+                <div class="team-img">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4>Sneha Reddy</h4>
+                <p>Customer Support Lead</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Backend Integration -->
+<script src="{% static 'store/js/script.js' %}"></script>
+<script src="{% static 'store/js/radhi.js' %}"></script>
+
+<!-- User Profile Management -->
+<script>
+    // Load user profile on page load
+    function loadUserProfile() {
+        const user = JSON.parse(sessionStorage.getItem('radhi-user') || localStorage.getItem('radhi-user') || '{}');
+        const userInfo = document.getElementById('userInfo');
+        const userMenuList = document.getElementById('userMenuList');
+        const navbarProfilePic = document.getElementById('navbarProfilePic');
+        const navbarUserIcon = document.getElementById('navbarUserIcon');
+        
+        if (user.loggedIn) {
+            // Show avatar in navbar
+            const firstLetter = (user.name || 'U').charAt(0).toUpperCase();
+            const canvas = document.createElement('canvas');
+            canvas.width = 100;
+            canvas.height = 100;
+            const ctx = canvas.getContext('2d');
+            
+            // Solid green background
+            ctx.fillStyle = '#28a745';
+            ctx.fillRect(0, 0, 100, 100);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 50px Poppins, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(firstLetter, 50, 50);
+            
+            navbarProfilePic.src = canvas.toDataURL();
+            navbarProfilePic.style.display = 'block';
+            navbarUserIcon.style.display = 'none';
+            
+            // User logged in
+            userInfo.innerHTML = `
+                <div class="user-greeting">Hello!</div>
+                <div class="user-name">${user.name || 'User'}</div>
+                <div class="user-email">${user.email || ''}</div>
+            `;
+            
+            userMenuList.innerHTML = `
+                <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
+                <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                <li><a href="{% url 'addresses' %}"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            `;
+        } else {
+            // Show default icon
+            navbarProfilePic.style.display = 'none';
+            navbarUserIcon.style.display = 'block';
+            
+            // Guest user
+            userInfo.innerHTML = `
+                <div class="user-greeting">Welcome!</div>
+                <div class="user-name">Guest User</div>
+            `;
+            
+            userMenuList.innerHTML = `
+                <li><a href="{% url 'auth' %}"><i class="fas fa-sign-in-alt"></i> Login / Register</a></li>
+                <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Cart</a></li>
+                <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+            `;
+        }
+    }
+    
+    // Handle logout
+    function handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            sessionStorage.removeItem('radhi-user');
+            alert('✅ Logged out successfully!');
+            location.reload();
+        }
+    }
+    
+    // Theme Toggle
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const icon = document.getElementById('themeIcon');
+        if (document.body.classList.contains('dark-mode')) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            localStorage.setItem('radhi-theme', 'dark');
+        } else {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+            localStorage.setItem('radhi-theme', 'light');
+        }
+    }
+
+    // Load saved theme on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedTheme = localStorage.getItem('radhi-theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+    });
+    
+    // User Dropdown Toggle
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('active');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const userMenu = document.getElementById('userMenu');
+        if (!userMenu.contains(event.target)) {
+            document.getElementById('userDropdown').classList.remove('show');
+        }
+    });
+    
+    // Update cart and wishlist counts
+    function updateCounts() {
+        let cart = JSON.parse(localStorage.getItem("radhi-cart")) || [];
+        let wishlist = JSON.parse(localStorage.getItem("radhi-wishlist")) || [];
+        document.getElementById("cartCount").innerText = cart.length;
+        document.getElementById("wishlistCount").innerText = wishlist.length;
+    }
+    
+    // Load profile and counts when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUserProfile();
+        updateCounts();
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+  .invoice-detail-page { max-width: 1100px; }
+  .two-col { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+  @media (max-width: 900px){ .two-col{ grid-template-columns:1fr; } }
+  .soft-btn { background:#f3f4f6; color:#374151; border:1px solid #e5e7eb; }
+  .soft-btn:hover { background:#e5e7eb; color:#374151; }
+  .totals-box { background:#f8faf8; border-radius:12px; padding:14px; border:1px solid #e5e7eb; margin-top:12px; }
+  .tot-row { display:flex; justify-content:space-between; gap:10px; margin:6px 0; font-size:14px; }
+  .tot-row strong { color:#2e7d32; }
+  @media print{
+    .noPrint{ display:none !important; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delivery-page invoice-detail-page">
+  <div class="page-header">
+    <h2><i data-lucide="file-invoice"></i> Invoice #{{ invoice.invoice_number }}</h2>
+    <div class="noPrint" style="display:flex; gap:10px; flex-wrap:wrap; margin-left:auto;">
+      <a href="{% url 'invoice_list' %}" class="btn-track soft-btn">Back</a>
+      <a href="{% url 'download_invoice_pdf' invoice.pk %}" class="btn-track soft-btn">Download PDF</a>
+      <button type="button" class="btn-track" onclick="window.print()">Print</button>
+    </div>
+  </div>
+
+  <!-- Quick stats (like Orders page) -->
+  <div class="quick-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e3f2fd; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="receipt" style="color: #1565c0;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Subtotal</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">₹{{ invoice.subtotal|floatformat:0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #fff4d8; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="percent" style="color: #b8860b;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">GST/Tax</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">₹{{ invoice.tax_amount|floatformat:0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #fdecea; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="tag" style="color: #c62828;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Discount</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">₹{{ invoice.discount|floatformat:0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e8f5e9; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="indian-rupee" style="color: #2e7d32;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Final Total</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">₹{{ invoice.total_amount|floatformat:0 }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="track-details-card">
+      <h3><i data-lucide="user"></i> Customer</h3>
+      <p><strong>Name:</strong> {{ invoice.customer.name }}</p>
+      <p><strong>Email:</strong> {{ invoice.customer.email|default:"-" }}</p>
+      <p><strong>Phone:</strong> {{ invoice.customer.phone|default:"-" }}</p>
+      <p><strong>Location:</strong> {{ invoice.customer.location|default:"-" }}</p>
+    </div>
+
+    <div class="track-details-card">
+      <h3><i data-lucide="credit-card"></i> Invoice Info</h3>
+      <p><strong>Order ID:</strong> {{ invoice.order.order_id }}</p>
+      <p><strong>Issue Date:</strong> {{ invoice.issue_date|date:"d M Y" }}</p>
+      <p><strong>Status:</strong> {{ invoice.payment_status }}</p>
+      <p><strong>Transaction ID:</strong> {{ invoice.transaction_id }}</p>
+      <div class="totals-box">
+        <div class="tot-row"><span>Subtotal</span><strong>₹{{ invoice.subtotal|floatformat:2 }}</strong></div>
+        <div class="tot-row"><span>Discount</span><strong>- ₹{{ invoice.discount|floatformat:2 }}</strong></div>
+        <div class="tot-row"><span>{{ invoice.tax_name|default:"GST" }} ({{ invoice.tax_percentage }}%)</span><strong>₹{{ invoice.tax_amount|floatformat:2 }}</strong></div>
+        <div class="tot-row" style="border-top:1px solid #e5e7eb; padding-top:8px;"><span><strong>Total</strong></span><strong>₹{{ invoice.total_amount|floatformat:2 }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="track-details-card noPrint" style="margin-top:20px;">
+    <h3><i data-lucide="edit-3"></i> Update Invoice</h3>
+    <form method="post" style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+      {% csrf_token %}
+      <div style="display:flex; flex-direction:column; gap:6px; min-width:200px; flex:1;">
+        <label style="font-size:12px; font-weight:600; color:#374151;">Discount</label>
+        {{ form.discount }}
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px; min-width:200px;">
+        <label style="font-size:12px; font-weight:600; color:#374151;">Payment Status</label>
+        {{ form.payment_status }}
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px; min-width:260px; flex:1;">
+        <label style="font-size:12px; font-weight:600; color:#374151;">Notes</label>
+        {{ form.notes }}
+      </div>
+      <button type="submit" class="btn-track">Save</button>
+      <a href="{% url 'tax_list' %}" class="btn-track soft-btn">Manage Taxes</a>
+    </form>
+  </div>
+
+  <div class="track-details-card" style="margin-top:20px;">
+    <h3><i data-lucide="package"></i> Items ({{ items|length }})</h3>
+    <div style="overflow-x:auto;">
+      <table class="items-table" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">#</th>
+            <th style="text-align:left; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">Product</th>
+            <th style="text-align:right; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">Qty</th>
+            <th style="text-align:right; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">Unit Price</th>
+            <th style="text-align:right; padding:12px; background:#f9fafb; border-bottom:2px solid #e5e7eb;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in items %}
+          <tr>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6;">{{ forloop.counter }}</td>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6;"><strong>{{ it.product_name }}</strong></td>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6; text-align:right;">{{ it.quantity }}</td>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6; text-align:right;">₹{{ it.unit_price|floatformat:2 }}</td>
+            <td style="padding:12px; border-bottom:1px solid #f3f4f6; text-align:right;"><strong>₹{{ it.line_total|floatformat:2 }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+{% endblock %}
+

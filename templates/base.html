@@ -1,0 +1,299 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Grocery{% endblock %}</title>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+          {% block extra_css %}{% endblock %}
+    
+    <style>
+        /* Admin Profile Icon - Top Right */
+        .admin-profile-top {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            z-index: 1000;
+        }
+        .admin-profile-icon {
+            width: 50px;
+            height: 50px;
+            background: #2e7d32;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .admin-profile-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        .admin-profile-icon i {
+            color: white;
+            font-size: 20px;
+        }
+        .admin-dropdown {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            overflow: hidden;
+        }
+        .admin-dropdown.show {
+            display: block;
+        }
+        .admin-dropdown-header {
+            padding: 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .admin-dropdown-header p {
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        .admin-dropdown-header span {
+            font-size: 12px;
+            color: #666;
+        }
+        .admin-dropdown ul {
+            list-style: none;
+            padding: 8px 0;
+            margin: 0;
+        }
+        .admin-dropdown ul li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .admin-dropdown ul li a:hover {
+            background: #f8f9fa;
+        }
+        .admin-dropdown ul li a i {
+            width: 18px;
+            color: #666;
+        }
+        .admin-dropdown ul li a.logout {
+            color: #dc3545;
+        }
+        .admin-dropdown ul li a.logout i {
+            color: #dc3545;
+        }
+        
+        /* Adjust main content to start below profile icon */
+        .main {
+            padding-top: 90px !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Admin Profile - Top Right -->
+<div class="admin-profile-top">
+    <div class="admin-profile-icon" onclick="toggleAdminDropdown()" id="adminProfileIcon">
+        <img id="adminProfilePic" src="" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
+        <i class="fas fa-user" id="adminUserIcon"></i>
+    </div>
+    <div class="admin-dropdown" id="adminDropdown">
+        <div class="admin-dropdown-header">
+            <p id="adminName">Administrator</p>
+            <span id="adminEmail">Admin Panel</span>
+        </div>
+        <ul>
+            <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> Go to Store</a></li>
+            <li><a href="{% url 'admin_settings' %}"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="{% url 'logout' %}" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR (COMMON FOR ALL PAGES) -->
+    <aside class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px; padding: 0 16px; cursor: pointer;" onclick="window.location.href='{% url 'home' %}'">
+            <div style="background: #66bb6a; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-leaf" style="color: white; font-size: 20px;"></i>
+            </div>
+            <div style="line-height: 1.2;">
+                <h2 style="margin: 0; font-size: 18px; color: white; font-weight: 700; white-space: nowrap;">The Daily Grocer</h2>
+                <span style="font-size: 10px; color: rgba(255,255,255,0.8); display: block; margin-top: 2px;">Premium Grocery Store</span>
+            </div>
+        </div>
+
+        <ul class="menu">
+
+            <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+    <a href="{% url 'dashboard' %}">
+        <i data-lucide="layout-dashboard"></i>
+        Dashboard
+    </a>
+</li>
+
+            <li class="{% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+    <a href="{% url 'product_list' %}">
+        <i data-lucide="package"></i>
+        Products
+    </a>
+</li>
+
+            <li class="{% if 'batch' in request.resolver_match.url_name %}active{% endif %}">
+    <a href="{% url 'batch_list' %}">
+        <i data-lucide="archive"></i>
+        Batch Management
+    </a>
+</li>
+
+            <li class="{% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
+    <a href="{% url 'category_list' %}">
+        <i data-lucide="layers"></i>
+        Category
+    </a>
+</li>
+
+            <li class="{% if 'subcategory' in request.resolver_match.url_name %}active{% endif %}">
+    <a href="{% url 'subcategory_list' %}">
+        <i data-lucide="layers"></i>
+        Sub Category
+    </a>
+</li>
+
+            <li class="{% if 'offer' in request.resolver_match.url_name %}active{% endif %}">
+    <a href="{% url 'offer_list' %}">
+        <i data-lucide="tag"></i>
+        Offers & Discounts
+    </a>
+</li>
+
+           <li class="{% if request.resolver_match.url_name == 'order_list' %}active{% endif %}">
+    <a href="{% url 'order_list' %}">
+        <i data-lucide="shopping-cart"></i>
+        Orders
+    </a>
+</li>
+
+           <li class="{% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
+    <a href="{% url 'customer_list' %}">
+        <i data-lucide="users"></i>
+        Customers
+    </a>
+</li>
+
+
+            <li class="{% if request.resolver_match.url_name == 'delivery_list' or request.resolver_match.url_name == 'track_order' %}active{% endif %}">
+    <a href="{% url 'delivery_list' %}">
+        <!-- <i class="fa-solid fa-truck"></i> -->
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="truck" aria-hidden="true" class="lucide lucide-truck"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path><circle cx="17" cy="18" r="2"></circle><circle cx="7" cy="18" r="2"></circle></svg>
+        Delivery Management
+    </a>
+</li>
+            <li class="{% if 'reports' in request.resolver_match.url_name %}active{% endif %}">
+    <a href="{% url 'reports_dashboard' %}">
+        <i class="fa-solid fa-chart-line"></i>
+        Reports & Analytics
+    </a>
+</li>
+            <li class="{% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
+    <a href="{% url 'payment_dashboard' %}">
+              <i data-lucide="credit-card"></i>
+        Payments
+        
+    </a>
+</li>
+        
+            <li class="{% if 'invoice' in request.resolver_match.url_name or 'tax' in request.resolver_match.url_name %}active{% endif %}">
+    <a href="{% url 'invoice_list' %}">
+        <i data-lucide="file-text"></i>
+        Invoices & Taxes
+    </a>
+</li>
+            <li class="{% if request.resolver_match.url_name == 'admin_settings' %}active{% endif %}">
+    <a href="{% url 'admin_settings' %}">
+        <i data-lucide="settings"></i>
+        Settings
+    </a>
+</li>
+            <li>
+    <a href="{% url 'logout' %}">
+        <i data-lucide="log-out"></i>
+        Logout
+    </a>
+</li>
+
+        </ul>
+    </aside>
+
+    <!-- PAGE CONTENT -->
+    <main class="main">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</div>
+
+<script>
+    lucide.createIcons();
+    
+    // Load Admin Profile Info
+    function loadAdminProfile() {
+        const user = JSON.parse(localStorage.getItem('radhi-user') || '{}');
+        const adminProfilePic = document.getElementById('adminProfilePic');
+        const adminUserIcon = document.getElementById('adminUserIcon');
+        const adminName = document.getElementById('adminName');
+        const adminEmail = document.getElementById('adminEmail');
+        
+        if (user.name) {
+            adminName.textContent = user.name;
+            adminEmail.textContent = user.email || user.mobile || 'Admin Panel';
+            
+            if (user.profilePic && adminProfilePic && adminUserIcon) {
+                adminProfilePic.src = user.profilePic;
+                adminProfilePic.style.display = 'block';
+                adminUserIcon.style.display = 'none';
+            }
+        }
+    }
+    
+    // Admin Dropdown Toggle
+    function toggleAdminDropdown() {
+        const dropdown = document.getElementById('adminDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const adminProfile = document.querySelector('.admin-profile-top');
+        const dropdown = document.getElementById('adminDropdown');
+        if (adminProfile && dropdown && !adminProfile.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAdminProfile();
+    });
+</script>
+
+</body>
+</html>

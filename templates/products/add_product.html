@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Product{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/category.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="category-page">
+    <div class="page-header">
+        <h2><i data-lucide="plus-circle"></i> Add New Product</h2>
+        <a href="{% url 'product_list' %}" class="btn-back">
+            <i data-lucide="arrow-left"></i> Back to Products
+        </a>
+    </div>
+
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data" class="category-form">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">Product Name *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <span class="error">{{ form.name.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.category.id_for_label }}">Category</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <span class="error">{{ form.category.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.subcategory.id_for_label }}">Sub Category</label>
+                    {{ form.subcategory }}
+                    {% if form.subcategory.errors %}
+                        <span class="error">{{ form.subcategory.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.image.id_for_label }}">Main Product Image</label>
+                    {{ form.image }}
+                    {% if form.image.errors %}
+                        <span class="error">{{ form.image.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="additional_images">Additional Images (Multiple)</label>
+                    <input type="file" name="additional_images" id="additional_images" multiple accept="image/*">
+                    <small style="display: block; margin-top: 5px; color: #6b7280; font-size: 12px;">You can select multiple images at once</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.selling_price.id_for_label }}">Base Selling Price (₹) *</label>
+                    {{ form.selling_price }}
+                    {% if form.selling_price.errors %}
+                        <span class="error">{{ form.selling_price.errors.0 }}</span>
+                    {% endif %}
+                    <small style="display: block; margin-top: 5px; color: #6b7280; font-size: 12px;">Base price for reference. Actual prices set in variants below.</small>
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>
+                        {{ form.is_active }}
+                        Active Product
+                    </label>
+                </div>
+            </div>
+
+            <!-- Product Variants Section -->
+            <div class="variants-section" style="margin-top: 30px; padding: 20px; background: #f9fafb; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #1f2937;">
+                        <i data-lucide="layers"></i> Product Variants (Weight/Size Options)
+                    </h3>
+                    <button type="button" onclick="addVariantRow()" class="btn-track" style="padding: 8px 16px;">
+                        <i data-lucide="plus"></i> Add Variant
+                    </button>
+                </div>
+                
+                <div id="variantsContainer">
+                    <!-- Variant rows will be added here -->
+                    <div class="variant-row" data-variant-index="0">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 15px; align-items: end; padding: 15px; background: white; border-radius: 8px; margin-bottom: 10px;">
+                            <div class="form-group" style="margin: 0;">
+                                <label>Weight/Size *</label>
+                                <input type="text" name="variant_weight_0" placeholder="e.g., 100g, 1kg, 500ml" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label>Unit Type *</label>
+                                <select name="variant_unit_type_0" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                                    <option value="kg">Kilogram (kg)</option>
+                                    <option value="g">Gram (g)</option>
+                                    <option value="l">Liter (l)</option>
+                                    <option value="ml">Milliliter (ml)</option>
+                                    <option value="piece">Piece</option>
+                                    <option value="pack">Pack</option>
+                                    <option value="box">Box</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label>Selling Price (₹) *</label>
+                                <input type="number" name="variant_price_0" step="0.01" placeholder="0.00" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label>Quick Stock (Optional)</label>
+                                <input type="number" name="variant_stock_0" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                                <small style="color: #6b7280; font-size: 11px;">Leave empty for Batch</small>
+                            </div>
+                            <button type="button" onclick="removeVariantRow(this)" class="btn-cancel" style="padding: 10px; margin-bottom: 0;">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 10px; color: #6b7280; font-size: 13px;">
+                    <i data-lucide="info"></i> <strong>Two Options:</strong> (1) Add Quick Stock here for simple products, OR (2) Leave empty and use Batch Management for expiry tracking.
+                </p>
+            </div>
+
+            <script>
+                let variantIndex = 1;
+                
+                function addVariantRow() {
+                    const container = document.getElementById('variantsContainer');
+                    const newRow = document.createElement('div');
+                    newRow.className = 'variant-row';
+                    newRow.setAttribute('data-variant-index', variantIndex);
+                    newRow.innerHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 15px; align-items: end; padding: 15px; background: white; border-radius: 8px; margin-bottom: 10px;">
+                            <div class="form-group" style="margin: 0;">
+                                <label>Weight/Size *</label>
+                                <input type="text" name="variant_weight_${variantIndex}" placeholder="e.g., 100g, 1kg, 500ml" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label>Unit Type *</label>
+                                <select name="variant_unit_type_${variantIndex}" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                                    <option value="kg">Kilogram (kg)</option>
+                                    <option value="g">Gram (g)</option>
+                                    <option value="l">Liter (l)</option>
+                                    <option value="ml">Milliliter (ml)</option>
+                                    <option value="piece">Piece</option>
+                                    <option value="pack">Pack</option>
+                                    <option value="box">Box</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label>Selling Price (₹) *</label>
+                                <input type="number" name="variant_price_${variantIndex}" step="0.01" placeholder="0.00" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label>Quick Stock (Optional)</label>
+                                <input type="number" name="variant_stock_${variantIndex}" placeholder="0" min="0" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                                <small style="color: #6b7280; font-size: 11px;">Leave empty for Batch</small>
+                            </div>
+                            <button type="button" onclick="removeVariantRow(this)" class="btn-cancel" style="padding: 10px; margin-bottom: 0;">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(newRow);
+                    variantIndex++;
+                    lucide.createIcons();
+                }
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label>Selling Price (₹) *</label>
+                                <input type="number" name="variant_price_${variantIndex}" step="0.01" placeholder="0.00" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                            </div>
+                            <button type="button" onclick="removeVariantRow(this)" class="btn-cancel" style="padding: 10px; margin-bottom: 0;">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(newRow);
+                    variantIndex++;
+                    
+                    // Reinitialize lucide icons
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }
+                
+                function removeVariantRow(button) {
+                    const row = button.closest('.variant-row');
+                    const container = document.getElementById('variantsContainer');
+                    
+                    // Don't allow removing if it's the last row
+                    if (container.children.length > 1) {
+                        row.remove();
+                    } else {
+                        alert('At least one variant is required!');
+                    }
+                }
+            </script>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i data-lucide="save"></i> Add Product
+                </button>
+                <a href="{% url 'product_list' %}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

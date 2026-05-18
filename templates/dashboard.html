@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+<div class="cards">
+
+    <!-- TOTAL SALES (apna filter) -->
+    <div class="card">
+        <div class="card-top">
+            <div class="stat-icon sale">
+            <i data-lucide="shopping-cart"></i>
+            </div>
+            <p>Total Sales</p>
+            <form action="{% url 'dashboard' %}" method="get" class="card-period-form">
+                <input type="hidden" name="income_period" value="{{ income_period }}">
+                <input type="hidden" name="visitors_period" value="{{ visitors_period }}">
+                <input type="hidden" name="chart_period" value="{{ chart_period }}">
+                <input type="hidden" name="products_period" value="{{ products_period }}">
+                <input type="hidden" name="orders_period" value="{{ orders_period }}">
+                <select name="sales_period" onchange="this.form.submit()">
+                    {% for choice in period_choices %}
+                    <option value="{{ choice }}" {% if sales_period == choice %}selected{% endif %}>{{ choice }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <h2>₹{{ total_sales|floatformat:0 }}</h2>
+        {% if sales_period != 'All' %}
+            <span class="{% if sales_change >= 0 %}green{% else %}red{% endif %}">
+                {% if sales_change >= 0 %}+{% endif %}{{ sales_change|floatformat:1 }}%
+            </span>
+        {% endif %}
+    </div>
+
+    <!-- TOTAL INCOME (apna filter) -->
+    <div class="card">
+        <div class="card-top">
+            <div class="stat-icon income">
+            <i data-lucide="wallet"></i>
+            </div>
+            <p>Total Income</p>
+            <form action="{% url 'dashboard' %}" method="get" class="card-period-form">
+                <input type="hidden" name="sales_period" value="{{ sales_period }}">
+                <input type="hidden" name="visitors_period" value="{{ visitors_period }}">
+                <input type="hidden" name="chart_period" value="{{ chart_period }}">
+                <input type="hidden" name="products_period" value="{{ products_period }}">
+                <input type="hidden" name="orders_period" value="{{ orders_period }}">
+                <select name="income_period" onchange="this.form.submit()">
+                    {% for choice in period_choices %}
+                    <option value="{{ choice }}" {% if income_period == choice %}selected{% endif %}>{{ choice }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <h2>₹{{ total_income|floatformat:0 }}</h2>
+        {% if income_period != 'All' %}
+            <span class="{% if income_change >= 0 %}green{% else %}red{% endif %}">
+                {% if income_change >= 0 %}+{% endif %}{{ income_change|floatformat:1 }}%
+            </span>
+        {% endif %}
+    </div>
+
+    <!-- VISITORS (apna filter) -->
+    <div class="card">
+        <div class="card-top">
+            <div class="stat-icon visitor">
+            <i data-lucide="users"></i>
+            </div>
+            <p>Total Visitors</p>
+            <form action="{% url 'dashboard' %}" method="get" class="card-period-form">
+                <input type="hidden" name="sales_period" value="{{ sales_period }}">
+                <input type="hidden" name="income_period" value="{{ income_period }}">
+                <input type="hidden" name="chart_period" value="{{ chart_period }}">
+                <input type="hidden" name="products_period" value="{{ products_period }}">
+                <input type="hidden" name="orders_period" value="{{ orders_period }}">
+                <select name="visitors_period" onchange="this.form.submit()">
+                    {% for choice in period_choices %}
+                    <option value="{{ choice }}" {% if visitors_period == choice %}selected{% endif %}>{{ choice }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <h2>{{ visitors }}</h2>
+        {% if visitors_period != 'All' %}
+            <span class="{% if visitors_change >= 0 %}green{% else %}red{% endif %}">
+                {% if visitors_change >= 0 %}+{% endif %}{{ visitors_change|floatformat:1 }}%
+            </span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="summary-product-grid">
+    <!-- LEFT : GRAPH -->
+<div class="summary-card">
+
+    <div class="summary-header">
+        <h3>Total Summary</h3>
+        <form action="{% url 'dashboard' %}" method="get" class="card-period-form">
+            <input type="hidden" name="sales_period" value="{{ sales_period }}">
+            <input type="hidden" name="income_period" value="{{ income_period }}">
+            <input type="hidden" name="visitors_period" value="{{ visitors_period }}">
+            <input type="hidden" name="products_period" value="{{ products_period }}">
+            <input type="hidden" name="orders_period" value="{{ orders_period }}">
+            <select name="chart_period" id="summaryFilter" class="custom-select" onchange="this.form.submit()">
+                {% for choice in period_choices %}
+                <option value="{{ choice }}" {% if chart_period == choice %}selected{% endif %}>{{ choice }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <div class="summary-income">
+        <div class="circle-icon">
+            ↗
+        </div>
+        <div>
+            <p>Income</p>
+            <h2>₹{{ chart_income|floatformat:0 }}</h2>
+        </div>
+    </div>
+
+    <div class="chart-box">
+        <canvas id="incomeChart"></canvas>
+    </div>
+
+</div>
+
+    <!-- RIGHT : TOP PRODUCTS (apna filter) -->
+ <div class="top-products">
+        <div class="top-products-header">
+        <h3>Top Products</h3>
+        <form action="{% url 'dashboard' %}" method="get" class="card-period-form">
+            <input type="hidden" name="sales_period" value="{{ sales_period }}">
+            <input type="hidden" name="income_period" value="{{ income_period }}">
+            <input type="hidden" name="visitors_period" value="{{ visitors_period }}">
+            <input type="hidden" name="chart_period" value="{{ chart_period }}">
+            <input type="hidden" name="orders_period" value="{{ orders_period }}">
+            <select name="products_period" class="custom-select" onchange="this.form.submit()">
+                {% for choice in period_choices %}
+                <option value="{{ choice }}" {% if products_period == choice %}selected{% endif %}>{{ choice }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% for product in top_products %}
+    <div class="product-row">
+        <div class="product-icon blue">
+            {% if product.product_image %}
+                <img src="{{ product.product_image }}" alt="{{ product.product_name }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px; padding: 4px;">
+            {% else %}
+                <i data-lucide="package"></i>
+            {% endif %}
+        </div>
+        <div class="product-text">
+            <p class="name">{{ product.product_name }}</p>
+            <span>{{ product.total_qty }} Sold</span>
+        </div>
+    </div>
+    {% empty %}
+    <p class="no-data">No orders in this period.</p>
+    {% endfor %}
+
+          <div class="top-products-footer">
+          <a href="{% url 'product_list' %}" class="view-all">View All →</a>
+          </div>
+</div>
+
+<div class="order-stock-grid">
+
+    <!-- ORDER CARD (apna filter) -->
+    <div class="order-card">
+
+        <div class="order-header">
+            <h3>Order</h3>
+            <div class="order-filters">
+                <form action="{% url 'dashboard' %}" method="get" class="card-period-form" style="display:inline;">
+                    <input type="hidden" name="sales_period" value="{{ sales_period }}">
+                    <input type="hidden" name="income_period" value="{{ income_period }}">
+                    <input type="hidden" name="visitors_period" value="{{ visitors_period }}">
+                    <input type="hidden" name="chart_period" value="{{ chart_period }}">
+                    <input type="hidden" name="products_period" value="{{ products_period }}">
+                    <select name="orders_period" onchange="this.form.submit()">
+                        {% for choice in period_choices %}
+                        <option value="{{ choice }}" {% if orders_period == choice %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <div class="order-list">
+            {% for order in recent_orders %}
+            <div class="item">
+                <div class="product-img bg-orange">
+                    <i data-lucide="shopping-cart"></i>
+                </div>
+                <div class="item-info">
+                    <h4>#{{ order.order_id }} – {{ order.customer.name }}</h4>
+                </div>
+                <div class="item-date">{{ order.order_date|date:"d M Y" }}</div>
+            </div>
+            {% empty %}
+            <p class="no-data">No orders in this period.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- STOCK ALERT CARD -->
+    <div class="stock-card">
+
+        <div class="stock-header">
+            <h3>Stock Alerts</h3>
+            <a href="{% url 'low_stock_products' %}" class="view-all">View All →</a>
+        </div>
+
+        <div class="stock-list">
+            {% for alert in stock_alerts %}
+            <div class="item">
+                <div class="product-img {% if alert.status == 'out' %}bg-orange{% elif alert.status == 'low' %}bg-yellow{% else %}bg-yellow{% endif %}">
+                    {% if alert.product_image %}
+                        <img src="{{ alert.product_image }}" alt="{{ alert.product_name }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px; padding: 4px;">
+                    {% else %}
+                        <i data-lucide="package"></i>
+                    {% endif %}
+                </div>
+                <div class="item-info">
+                    <h4>{{ alert.product_name }}</h4>
+                </div>
+                <span class="status {% if alert.status == 'out' %}out{% elif alert.status == 'low' %}low{% else %}units{% endif %}">
+                    {{ alert.status_text }}
+                </span>
+            </div>
+            {% empty %}
+            <div class="item">
+                <div class="item-info">
+                    <p class="no-data">No stock alerts</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<!-- COMMENTS CARD -->
+    <div class="comments-card">
+
+        <div class="card-header">
+            <h3>Comments</h3>
+            <div class="comments-filters">
+                <form action="{% url 'dashboard' %}" method="get" class="card-period-form" style="display:inline;">
+                    <input type="hidden" name="sales_period" value="{{ sales_period }}">
+                    <input type="hidden" name="income_period" value="{{ income_period }}">
+                    <input type="hidden" name="visitors_period" value="{{ visitors_period }}">
+                    <input type="hidden" name="chart_period" value="{{ chart_period }}">
+                    <input type="hidden" name="products_period" value="{{ products_period }}">
+                    <input type="hidden" name="orders_period" value="{{ orders_period }}">
+                    <select name="comments_period" onchange="this.form.submit()">
+                        {% for choice in period_choices %}
+                        <option value="{{ choice }}" {% if comments_period == choice %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <div class="comment">
+            <img src="/static/images/user1.png" alt="">
+            <div class="info">
+                <h4>Divya Nair</h4>
+                <p>Fresh products & fast delivery!</p>
+            </div>
+        </div>
+
+        <div class="comment">
+            <img src="/static/images/user2.png" alt="">
+            <div class="info">
+                <h4>Harshit Choudhary</h4>
+                <p>Affordable and quality items.</p>
+            </div>
+        </div>
+
+        <div class="comment">
+            <img src="/static/images/user3.png" alt="">
+            <div class="info">
+                <h4>Jemy Deo</h4>
+                <p>So fresh and vibrant! Made a delicious salad tonight.</p>
+            </div>
+        </div>
+
+    </div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<script>
+    lucide.createIcons();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('incomeChart').getContext('2d');
+const chartLabels = {{ chart_labels_json|safe }};
+const chartValues = {{ chart_values_json|safe }};
+
+var gradient = ctx.createLinearGradient(0, 0, 0, 220);
+gradient.addColorStop(0, 'rgba(129, 199, 132, 0.4)');
+gradient.addColorStop(0.5, 'rgba(129, 199, 132, 0.15)');
+gradient.addColorStop(1, 'rgba(129, 199, 132, 0)');
+
+var maxVal = chartValues.length ? Math.max(...chartValues) : 0;
+var yMax = Math.max(maxVal * 1.15, 100);
+
+let incomeChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: chartLabels,
+        datasets: [{
+            label: 'Sales',
+            data: chartValues,
+            borderColor: '#43a047',
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.35,
+            borderWidth: 2.5,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#43a047',
+            pointHoverBorderWidth: 2,
+            spanGaps: true
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            intersect: false,
+            mode: 'index'
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(33, 33, 33, 0.9)',
+                padding: 10,
+                cornerRadius: 8,
+                titleFont: { size: 13 },
+                bodyFont: { size: 13 },
+                callbacks: {
+                    label: function(ctx) { return '₹' + ctx.parsed.y.toLocaleString('en-IN'); }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: {
+                    maxRotation: 0,
+                    font: { size: 11 },
+                    color: '#78909c',
+                    maxTicksLimit: 8
+                }
+            },
+            y: {
+                grid: {
+                    color: 'rgba(0,0,0,0.04)',
+                    drawBorder: false
+                },
+                min: 0,
+                max: yMax,
+                ticks: {
+                    font: { size: 11 },
+                    color: '#78909c',
+                    callback: function(val) { return '₹' + val.toLocaleString('en-IN'); }
+                }
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}

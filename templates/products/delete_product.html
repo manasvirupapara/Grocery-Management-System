@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Product{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/category.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="category-page">
+    <div class="page-header">
+        <h2><i data-lucide="trash-2"></i> Delete Product</h2>
+        <a href="{% url 'product_list' %}" class="btn-back">
+            <i data-lucide="arrow-left"></i> Back to Products
+        </a>
+    </div>
+
+    <div class="delete-container">
+        <div class="delete-card">
+            <div class="delete-icon">
+                <i data-lucide="alert-triangle" style="width: 60px; height: 60px; color: #dc2626;"></i>
+            </div>
+            
+            <h3>Are you sure you want to delete this product?</h3>
+            
+            <div class="product-info">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 120px; border-radius: 8px; margin-bottom: 15px;">
+                {% endif %}
+                <p><strong>Product Name:</strong> {{ product.name }}</p>
+                <p><strong>Category:</strong> {{ product.category.name|default:"Uncategorized" }}</p>
+                <p><strong>Price:</strong> ₹{{ product.selling_price }}</p>
+                <p><strong>Stock:</strong> {{ product.stock_quantity }} units</p>
+            </div>
+
+            <p class="warning-text">
+                <i data-lucide="alert-circle"></i>
+                This action cannot be undone. The product will be permanently deleted.
+            </p>
+
+            <form method="post" class="delete-form">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <button type="submit" class="btn-delete-confirm">
+                        <i data-lucide="trash-2"></i> Yes, Delete Product
+                    </button>
+                    <a href="{% url 'product_list' %}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

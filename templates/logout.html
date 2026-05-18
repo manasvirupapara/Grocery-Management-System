@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logged Out</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="login-container">
+    <h1>Logged Out Successfully</h1>
+    <p class="subtitle">You have been logged out from Grocery Admin Panel</p>
+
+    <div style="margin: 25px 0; padding: 20px; background: #f1f8e9; border-radius: 8px; color: #2e7d32; font-size: 14px;">
+        <p style="margin: 0;">✓ Your session has been ended securely</p>
+    </div>
+
+    <a href="{% url 'login' %}" style="display: inline-block; width: 100%; padding: 12px; background: #66bb6a; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; transition: 0.3s;">
+        Login Again
+    </a>
+</div>
+</body>
+</html>

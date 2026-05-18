@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Management{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+  .btn-secondary-track {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+  }
+  .btn-secondary-track:hover {
+    background: #e5e7eb;
+    color: #374151;
+  }
+  .amount-green { color: #2e7d32; font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="delivery-page">
+  <div class="page-header">
+    <h2><i data-lucide="credit-card"></i> Payment Management</h2>
+    <a href="{% url 'export_payments' %}?period={{ period }}" class="btn-track btn-secondary-track" style="margin-left:auto;">Export</a>
+  </div>
+
+  <!-- Summary (cards) -->
+  <div class="quick-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e8f5e9; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="indian-rupee" style="color: #2e7d32;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Total Revenue</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">₹{{ total_revenue|floatformat:0 }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #e6f4ea; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="check-circle" style="color: #2e7d32;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Completed Payments</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ success_count }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #fff4d8; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="clock" style="color: #b8860b;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Pending Payments</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ pending_count }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; background: #fdecea; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="x-circle" style="color: #c62828;"></i>
+        </div>
+        <div>
+          <p style="margin: 0; color: #6b7280; font-size: 12px;">Failed Payments</p>
+          <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ failed_count }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="delivery-filters">
+    <form action="{% url 'payment_dashboard' %}" method="get" class="filter-form">
+      <input type="text" name="search" placeholder="Search by customer name or transaction ID..." value="{{ search }}">
+      <select name="status">
+        <option value="" {% if not status %}selected{% endif %}>All</option>
+        <option value="Success" {% if status == 'Success' %}selected{% endif %}>Completed</option>
+        <option value="Pending" {% if status == 'Pending' %}selected{% endif %}>Pending</option>
+        <option value="Cancelled" {% if status == 'Cancelled' %}selected{% endif %}>Failed</option>
+      </select>
+      <select name="method">
+        <option value="" {% if not method %}selected{% endif %}>All Methods</option>
+        <option value="COD" {% if method == 'COD' %}selected{% endif %}>COD</option>
+        <option value="UPI" {% if method == 'UPI' %}selected{% endif %}>UPI</option>
+        <option value="Card" {% if method == 'Card' %}selected{% endif %}>Card</option>
+        <option value="NetBanking" {% if method == 'NetBanking' %}selected{% endif %}>Net Banking</option>
+      </select>
+      <button type="submit" class="btn-track">Search</button>
+    </form>
+  </div>
+
+  <!-- Payments (cards) -->
+  <div class="track-order-cards">
+    {% for order in page_obj %}
+    <div class="track-card">
+      <div class="track-card-top">
+        <span class="order-id">#{{ order.order_id }}</span>
+        {% if order.payment_status == 'Success' %}
+          <span class="delivery-badge" style="background:#dcfce7; color:#15803d;">Completed</span>
+        {% elif order.payment_status == 'Pending' %}
+          <span class="delivery-badge" style="background:#fff4d8; color:#b8860b;">Pending</span>
+        {% else %}
+          <span class="delivery-badge" style="background:#fdecea; color:#c62828;">Failed</span>
+        {% endif %}
+      </div>
+      <div class="track-card-body">
+        <p><strong>{{ order.customer.name }}</strong></p>
+        <p class="text-muted">
+          {{ order.get_payment_method_display }} ·
+          {% if order.transaction_id %}{{ order.transaction_id }}{% else %}N/A{% endif %}
+        </p>
+        <p>
+          <span class="amount-green">₹{{ order.calculated_total_amount|floatformat:2 }}</span>
+          · {{ order.order_date|date:"d M Y" }}
+        </p>
+      </div>
+      <div class="track-card-footer">
+        <a href="{% url 'payment_detail' order.pk %}" class="btn-track">View Details</a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="no-orders"><p>No payments found.</p></div>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="pagination-bar">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}&status={{ status }}&method={{ method }}&search={{ search }}">‹ Prev</a>
+    {% endif %}
+    <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}&status={{ status }}&method={{ method }}&search={{ search }}">Next ›</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+{% endblock %}

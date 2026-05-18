@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Orders{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page">
+    <div class="page-header">
+        <h2><i data-lucide="shopping-cart"></i> Orders Management</h2>
+    </div>
+
+    <!-- QUICK STATS CARDS -->
+    <div class="quick-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: #e8f5e9; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="shopping-bag" style="color: #2e7d32;"></i>
+                </div>
+                <div>
+                    <p style="margin: 0; color: #6b7280; font-size: 12px;">Total Orders</p>
+                    <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ total_orders_count }}</h3>
+                </div>
+            </div>
+        </div>
+        <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: #fff4d8; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="clock" style="color: #b8860b;"></i>
+                </div>
+                <div>
+                    <p style="margin: 0; color: #6b7280; font-size: 12px;">Pending Orders</p>
+                    <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ pending_orders_count }}</h3>
+                </div>
+            </div>
+        </div>
+        <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: #e6f4ea; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="check-circle" style="color: #2e7d32;"></i>
+                </div>
+                <div>
+                    <p style="margin: 0; color: #6b7280; font-size: 12px;">Success Orders</p>
+                    <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">{{ success_orders_count }}</h3>
+                </div>
+            </div>
+        </div>
+        <div style="background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: #e3f2fd; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="dollar-sign" style="color: #1565c0;"></i>
+                </div>
+                <div>
+                    <p style="margin: 0; color: #6b7280; font-size: 12px;">Avg Order Value</p>
+                    <h3 style="margin: 4px 0 0 0; color: #374151; font-size: 20px;">₹{{ avg_order_value|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="delivery-filters">
+        <form action="{% url 'order_list' %}" method="get" class="filter-form">
+            <input type="text" name="search" placeholder="Search by Order ID or customer..." value="{{ search }}">
+            <select name="period">
+                {% for choice in period_choices %}
+                <option value="{{ choice }}" {% if period == choice %}selected{% endif %}>{{ choice }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-track">Search</button>
+        </form>
+    </div>
+
+    <div class="track-order-cards">
+        {% for order in page_obj %}
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id">#{{ order.order_id }}</span>
+                {% if order.payment_status == 'Cancelled' %}
+                <span class="delivery-badge" style="background: #fdecea; color: #c62828;">Cancelled</span>
+                {% elif order.payment_status == 'Success' %}
+                <span class="delivery-badge" style="background: #e6f4ea; color: #2e7d32;">Success</span>
+                {% elif order.payment_status == 'Pending' %}
+                <span class="delivery-badge" style="background: #fff4d8; color: #b8860b;">Pending</span>
+                {% else %}
+                <span class="delivery-badge">{{ order.payment_status }}</span>
+                {% endif %}
+            </div>
+            <div class="track-card-body">
+                <p><strong>{{ order.customer.name }}</strong></p>
+                <p class="text-muted">{{ order.order_date|date:"d M Y" }}</p>
+                <p>₹ {{ order.calculated_total_amount|floatformat:2 }} · {{ order.calculated_total_items }} item{{ order.calculated_total_items|pluralize }}</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'order_detail' order.id %}" class="btn-track">View Details</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-orders">
+            <p>No orders found.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-bar">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if period %}&period={{ period }}{% endif %}">‹ Prev</a>
+        {% endif %}
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if period %}&period={{ period }}{% endif %}">Next ›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

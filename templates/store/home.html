@@ -1,0 +1,1361 @@
+{% load static %}
+<!-- FORCE RELOAD: v6.0 - 2026-02-26-17:00 - PRICE VISIBILITY FIX -->
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>The Daily Grocer - Premium Grocery Store</title>
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}?v=20260226-1700">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-main">
+            <div class="container">
+                <div class="header-content" style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+                    <div class="logo" style="cursor: pointer; flex-shrink: 0;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="logo-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="logo-text">
+                                <h1 style="white-space: nowrap;">The Daily Grocer</h1>
+                                <span>Premium Grocery Store</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="main-nav" style="flex-shrink: 0;">
+                        <ul>
+                            <li><a href="{% url 'home' %}" class="active">Home</a></li>
+                            <li>
+                                <a href="{% url 'shop' %}">Shop</a>
+                            </li>
+                            <li><a href="{% url 'about' %}">About</a></li>
+                            <li><a href="{% url 'contact' %}">Contact</a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="navbar-search" style="flex: 1; max-width: 400px;">
+                        <input type="text" id="navbarSearchBox" placeholder="Search for products..." onkeypress="handleNavbarSearch(event)">
+                        <button class="navbar-search-btn" onclick="performNavbarSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="header-actions" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
+                        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </div>
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-icon" onclick="toggleUserDropdown()">
+                                <img id="navbarProfilePic" src="" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #28a745;">
+                                <i class="fas fa-user" id="navbarUserIcon"></i>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <div class="user-info" id="userInfo"></div>
+                                <ul class="user-menu-list" id="userMenuList"></ul>
+                            </div>
+                        </div>
+                        <div class="wishlist-icon" onclick="window.location.href='{% url 'wishlist' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-heart"></i>
+                            <span class="count" id="wishlistCount" style="position: absolute; top: -8px; right: -8px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                        <div class="cart-icon" onclick="window.location.href='{% url 'cart' %}'" style="position: relative; cursor: pointer;">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="count" id="cartCount" style="position: absolute; top: -8px; right: -8px; background: #28a745; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="search-overlay" id="searchOverlay">
+            <div class="search-container">
+                <input type="text" id="searchBox" placeholder="Search for fresh products...">
+                <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+                <button class="close-search" onclick="toggleSearch()"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-slider">
+            <!-- Slide 1 - Very Light Green -->
+            <div class="hero-slide active" style="background: #e8f5e9; transition: all 0.3s ease;">
+                <div class="container">
+                    <div class="hero-content">
+                        <span class="hero-badge" style="background: #28a745; color: white;">100% Organic</span>
+                        <h1 class="hero-title" style="color: #2c3e50;">Fresh Vegetables<br>& Fruits</h1>
+                        <p class="hero-subtitle" style="color: #555;">Farm fresh products delivered to your doorstep</p>
+                        <button class="btn-hero" onclick="window.location.href='/shop/'">
+                            Shop Now <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&h=600&fit=crop" alt="Kirana Shop Interior">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 - Very Light Orange/Peach -->
+            <div class="hero-slide" style="background: #fff3e0; transition: all 0.3s ease;">
+                <div class="container">
+                    <div class="hero-content">
+                        <span class="hero-badge" style="background: #ff9800; color: white;">Premium Quality</span>
+                        <h1 class="hero-title" style="color: #2c3e50;">Daily Essentials<br>& Groceries</h1>
+                        <p class="hero-subtitle" style="color: #555;">Everything you need for your kitchen</p>
+                        <button class="btn-hero" onclick="window.location.href='/shop/'">
+                            Shop Now <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=600&h=600&fit=crop" alt="Grocery Products">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 - Very Light Blue -->
+            <div class="hero-slide" style="background: #e3f2fd; transition: all 0.3s ease;">
+                <div class="container">
+                    <div class="hero-content">
+                        <span class="hero-badge" style="background: #2196f3; color: white;">Best Prices</span>
+                        <h1 class="hero-title" style="color: #2c3e50;">Special Offers<br>& Deals</h1>
+                        <p class="hero-subtitle" style="color: #555;">Save more on your favorite products</p>
+                        <button class="btn-hero" onclick="window.location.href='/shop/'">
+                            Shop Now <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=600&h=600&fit=crop" alt="Special Offers">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-controls">
+            <button class="hero-prev" onclick="changeHeroSlide(-1)" title="Previous">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="hero-next" onclick="changeHeroSlide(1)" title="Next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="hero-indicators">
+            <span class="indicator active" onclick="goToSlide(0)"></span>
+            <span class="indicator" onclick="goToSlide(1)"></span>
+            <span class="indicator" onclick="goToSlide(2)"></span>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>100% Secure</h3>
+                    <p>Safe payment methods</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <h3>Easy Returns</h3>
+                    <p>7 days return policy</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Dedicated customer care</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Shop by Category</h2>
+                <p class="section-subtitle">Explore our wide range of fresh products</p>
+            </div>
+            <div class="categories-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px;">
+                <!-- All Products -->
+                <div class="category-item" onclick="window.location.href='{% url 'shop' %}?category=all'" style="text-align: center;">
+                    <div class="category-image" style="height: 140px; border-radius: 15px;">
+                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop" alt="All Products">
+                    </div>
+                    <h3 style="font-size: 14px; margin-top: 12px;">All Products</h3>
+                </div>
+                
+                <!-- Dynamic Categories from Database -->
+                {% for category in categories %}
+                <div class="category-item" onclick="window.location.href='/shop/?category={{ category.id }}'" style="text-align: center;">
+                    <div class="category-image" style="height: 140px; border-radius: 15px;">
+                        {% if category.image %}
+                            <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop" alt="{{ category.name }}">
+                        {% endif %}
+                    </div>
+                    <h3 style="font-size: 14px; margin-top: 12px;">{{ category.name }}</h3>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section class="products" id="products">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Featured Products</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    {% for category in categories %}
+                        <button class="filter-btn" data-filter="{{ category.name|lower }}">
+                            {{ category.name }}
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="products-grid">
+                {% for product in products %}
+                <div class="product-card" data-id="{{ product.id }}" data-category="{{ product.category.name|lower }}">
+                    
+                    <!-- Badges Top Left -->
+                    <div class="product-badges">
+                        {% if product.stock_quantity == 0 %}
+                            <span class="badge out-of-stock">OUT OF STOCK</span>
+                        {% elif product.stock_quantity <= 10 %}
+                            <span class="badge low-stock">LOW STOCK</span>
+                        {% endif %}
+                        {% if product.discount_percentage > 0 %}
+                            <span class="badge discount">{{ product.discount_percentage|floatformat:0 }}% OFF</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Wishlist Top Right -->
+                    <button class="wishlist-btn" onclick="toggleWishlist({{ product.id }}, '{{ product.name }}', {{ product.final_price }}, '{% if product.image %}{{ product.image }}{% else %}https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop{% endif %}', '{{ product.category.name }}', '{% if product.offer_name %}{{ product.offer_name }}{% endif %}', {{ product.stock_quantity }})">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    
+                    <!-- Product Image -->
+                    <div class="product-image">
+                        {% if product.image %}
+                            <img src="{{ product.image }}" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="quick-actions">
+                            {% if product.stock_quantity > 0 %}
+                                <button 
+                                    data-id="{{ product.id }}"
+                                    data-name="{{ product.name|escapejs }}"
+                                    data-price="{{ product.final_price|floatformat:2 }}"
+                                    data-original="{{ product.original_price|floatformat:2 }}"
+                                    data-discount="{{ product.discount_percentage|floatformat:2 }}"
+                                    onclick="homeAddToCart(this)" title="Add to Cart">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </button>
+                            {% endif %}
+                            <button onclick="quickView({{ product.id }})" title="Quick View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Product Info -->
+                    <div class="product-info">
+                        <span class="product-category">{{ product.category.name }}</span>
+                        <h3>{{ product.name }}</h3>
+                        
+                        {% if product.offer_name %}
+                            <div class="product-offer" style="color: #28a745; font-size: 12px; font-weight: 600; margin-bottom: 5px;">
+                                <i class="fas fa-tag"></i> {{ product.offer_name }}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Stock -->
+                        <div class="product-stock">
+                            {% if product.stock_quantity > 0 %}
+                                <span class="in-stock">{{ product.stock_quantity }} {{ product.unit_type|default:"units" }} available</span>
+                            {% else %}
+                                <span class="out-of-stock-text">Out of Stock</span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Expiry Date -->
+                        {% if product.expiry_date %}
+                        <div class="product-expiry" style="font-size: 12px; color: #666; margin-top: 4px;">
+                            <i class="far fa-calendar-alt"></i> Exp: {{ product.expiry_date|date:"d M Y" }}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Price -->
+                        <div class="product-price-section" style="margin-top: 10px;">
+                            {% if product.discount_percentage > 0 %}
+                                <strong class="current-price" style="font-size: 22px; color: #28a745;">₹{{ product.final_price|floatformat:2 }}</strong>
+                                <span style="font-size: 14px; color: #999; text-decoration: line-through; margin-left: 6px;">₹{{ product.original_price|floatformat:2 }}</span>
+                            {% else %}
+                                <strong class="current-price" style="font-size: 22px; color: #28a745;">₹{{ product.selling_price|floatformat:2 }}</strong>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Add to Cart Button -->
+                    {% if product.stock_quantity > 0 %}
+                        <button class="add-cart-btn" 
+                            data-id="{{ product.id }}"
+                            data-name="{{ product.name|escapejs }}"
+                            data-price="{{ product.final_price|floatformat:2 }}"
+                            data-original="{{ product.original_price|floatformat:2 }}"
+                            data-discount="{{ product.discount_percentage|floatformat:2 }}"
+                            onclick="homeAddToCart(this)">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                    {% else %}
+                        <button class="add-cart-btn" disabled style="background: #ccc; cursor: not-allowed;">
+                            <i class="fas fa-ban"></i> Out of Stock
+                        </button>
+                    {% endif %}
+                </div>
+                {% empty %}
+                    <div class="no-products">
+                        <p>No products available at the moment.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Sidebar -->
+    <div class="sidebar cart-sidebar" id="cartSidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-shopping-bag"></i> Shopping Cart</h3>
+            <button class="close-sidebar" onclick="toggleCartSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-body" id="cartBody">
+            <p class="empty-message">Your cart is empty</p>
+        </div>
+        <div class="sidebar-footer">
+            <div class="total-box">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #666;">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">₹0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #666;">
+                    <span>Tax ({{ tax_name }} {{ tax_percentage }}%):</span>
+                    <span id="cartTax">₹0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 2px solid #e0e0e0;">
+                    <span style="font-weight: 700; font-size: 18px;">Total:</span>
+                    <span class="total-amount" id="cartTotal" style="font-weight: 700; font-size: 18px; color: #28a745;">₹0</span>
+                </div>
+            </div>
+            <button class="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Wishlist Sidebar -->
+    <div class="sidebar wishlist-sidebar" id="wishlistSidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-heart"></i> My Wishlist</h3>
+            <button class="close-sidebar" onclick="toggleWishlistSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-body" id="wishlistBody">
+            <p class="empty-message">Your wishlist is empty</p>
+        </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div class="quick-view-modal" id="quickViewModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeQuickView()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-body">
+                <div class="modal-image">
+                    <div class="main-image-container">
+                        <img id="modalImage" src="" alt="Product" class="zoomable-image">
+                        <div class="zoom-icon">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                        <div class="modal-badges" id="modalBadges"></div>
+                        <div class="image-navigation">
+                            <button class="img-nav-btn prev" onclick="changeModalImage(-1)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button class="img-nav-btn next" onclick="changeModalImage(1)">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="thumbnail-gallery">
+                        <div class="thumbnail active" onclick="selectModalImage(0)">
+                            <img id="modalThumb1" src="" alt="View 1">
+                        </div>
+                        <div class="thumbnail" onclick="selectModalImage(1)">
+                            <img id="modalThumb2" src="" alt="View 2">
+                        </div>
+                        <div class="thumbnail" onclick="selectModalImage(2)">
+                            <img id="modalThumb3" src="" alt="View 3">
+                        </div>
+                    </div>
+                    <div class="image-counter">
+                        <span id="currentImageIndex">1</span> / 3
+                    </div>
+                </div>
+                <div class="modal-details">
+                    <span class="modal-category" id="modalCategory"></span>
+                    <h2 id="modalTitle"></h2>
+                    <div class="modal-rating" id="modalRating"></div>
+                    <div class="modal-price">
+                        <span class="current-price" id="modalPrice"></span>
+                        <span class="original-price" id="modalOldPrice"></span>
+                        <span class="discount-badge" id="modalDiscount"></span>
+                    </div>
+                    <div class="modal-description">
+                        <h4>Product Description</h4>
+                        <p id="modalDescription"></p>
+                    </div>
+                    <div class="modal-features">
+                        <h4>Key Features</h4>
+                        <ul id="modalFeatures">
+                            <li>✅ Premium Quality</li>
+                            <li>✅ Fresh & Hygienic</li>
+                            <li>✅ Best Price Guaranteed</li>
+                        </ul>
+                    </div>
+                    <div class="modal-quantity">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600;">Select Weight/Size:</label>
+                        <div class="weight-buttons" id="modalWeightButtons" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                            <!-- Weight buttons will be dynamically loaded here -->
+                        </div>
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600;">Quantity:</label>
+                        <div class="qty-selector">
+                            <button onclick="changeModalQty(-1)">-</button>
+                            <span id="modalQty">1</span>
+                            <button onclick="changeModalQty(1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Stock and Expiry Info -->
+                    <div style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                        <div id="modalStockInfo" style="color: #28a745; font-weight: 600; margin-bottom: 5px;">
+                            <!-- Stock info will be updated here -->
+                        </div>
+                        <div id="modalExpiryInfo" style="color: #666; font-size: 14px;">
+                            <!-- Expiry info will be updated here -->
+                        </div>
+                    </div>
+                    
+                    <style>
+                        .weight-btn {
+                            padding: 12px 20px;
+                            border: 2px solid #e0e0e0;
+                            background: white;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 15px;
+                            font-weight: 600;
+                            color: #666;
+                            transition: all 0.3s;
+                        }
+                        
+                        .weight-btn:hover:not(:disabled) {
+                            border-color: #28a745;
+                            color: #28a745;
+                        }
+                        
+                        .weight-btn.active {
+                            background: #28a745;
+                            border-color: #28a745;
+                            color: white;
+                        }
+                        
+                        .weight-btn:disabled {
+                            opacity: 0.5;
+                            cursor: not-allowed;
+                            background: #f5f5f5;
+                        }
+                    </style>
+                    
+                    <div class="modal-actions">
+                        <button class="modal-add-cart" onclick="addToCartFromModal()">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                        <button class="modal-wishlist" onclick="toggleWishlistFromModal()">
+                            <i class="far fa-heart"></i> Add to Wishlist
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <i class="fas fa-leaf"></i>
+                        <h3>The Daily Grocer</h3>
+                    </div>
+                    <p>Your trusted partner for fresh and organic groceries delivered right to your doorstep.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'shop' %}">Shop</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Customer Care</h4>
+                    <ul>
+                        <li><a href="{% url 'profile' %}">My Account</a></li>
+                        <li><a href="{% url 'orders' %}">Track Order</a></li>
+                        <li><a href="{% url 'contact' %}">Return Policy</a></li>
+                        <li><a href="{% url 'contact' %}">FAQs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul class="contact-list">
+                        <li><i class="fas fa-map-marker-alt"></i> Ahmedabad,Gujrat</li>
+                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope"></i> dailygrocer12@gmail.com</li>
+                        <li><i class="fas fa-clock"></i> Mon - Sun: 8AM - 10PM</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Radhi Fresh Mart. All Rights Reserved. Made with <i class="fas fa-heart"></i></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top -->
+    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Backend Integration -->
+    <script src="{% static 'store/js/script.js' %}"></script>
+    <!-- <script src="{% static 'store/js/radhi-api.js' %}"></script> -->
+    <script src="{% static 'store/js/radhi.js' %}"></script>
+    
+    <!-- User Profile Management -->
+    <script>
+        // Tax configuration from backend
+        const TAX_PERCENTAGE = {{ tax_percentage }};
+        const TAX_NAME = "{{ tax_name }}";
+        
+        // Product variant variables (shared across functions)
+        let selectedVariant = null;
+        let productVariants = [];
+        
+        // Hero Slider Functionality
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        const indicators = document.querySelectorAll('.hero-indicators .indicator');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            // Remove active class from all slides and indicators
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            // Add active class to current slide and indicator
+            slides[index].classList.add('active');
+            indicators[index].classList.add('active');
+        }
+
+        function changeHeroSlide(direction) {
+            currentSlide += direction;
+            
+            // Loop around
+            if (currentSlide >= totalSlides) {
+                currentSlide = 0;
+            } else if (currentSlide < 0) {
+                currentSlide = totalSlides - 1;
+            }
+            
+            showSlide(currentSlide);
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            showSlide(currentSlide);
+        }
+
+        // Start auto-play immediately - slider changes every 3 seconds
+        let autoPlayInterval = setInterval(() => {
+            changeHeroSlide(1);
+        }, 3000);
+
+        // Search functionality
+        function handleNavbarSearch(event) {
+            if (event.key === 'Enter') {
+                performNavbarSearch();
+            }
+        }
+
+        function performNavbarSearch() {
+            const searchInput = document.getElementById('navbarSearchBox');
+            const searchTerm = searchInput.value.trim();
+            
+            if (searchTerm) {
+                // Redirect to shop page with search query
+                window.location.href = `{% url 'shop' %}?search=${encodeURIComponent(searchTerm)}`;
+            }
+        }
+
+        // Pause auto-play on hover
+        const heroSection = document.querySelector('.hero');
+        if (heroSection) {
+            heroSection.addEventListener('mouseenter', () => {
+                clearInterval(autoPlayInterval);
+            });
+
+            heroSection.addEventListener('mouseleave', () => {
+                autoPlayInterval = setInterval(() => {
+                    changeHeroSlide(1);
+                }, 3000);
+            });
+        }
+
+        // Load user profile on page load
+        function loadUserProfile() {
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || '{}');
+            const userInfo = document.getElementById('userInfo');
+            const userMenuList = document.getElementById('userMenuList');
+            const navbarProfilePic = document.getElementById('navbarProfilePic');
+            const navbarUserIcon = document.getElementById('navbarUserIcon');
+            
+            if (user.loggedIn) {
+                // Show avatar in navbar
+                const firstLetter = (user.name || 'U').charAt(0).toUpperCase();
+                const canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+                
+                // Solid green background
+                ctx.fillStyle = '#28a745';
+                ctx.fillRect(0, 0, 100, 100);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 50px Poppins, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(firstLetter, 50, 50);
+                
+                navbarProfilePic.src = canvas.toDataURL();
+                navbarProfilePic.style.display = 'block';
+                navbarUserIcon.style.display = 'none';
+                
+                // User logged in
+                userInfo.innerHTML = `
+                    <div class="user-greeting">Hello!</div>
+                    <div class="user-name">${user.name || 'User'}</div>
+                    <div class="user-email">${user.email || ''}</div>
+                `;
+                
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i> My Profile</a></li>
+                    <li><a href="{% url 'orders' %}"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                    <li><a href="{% url 'addresses' %}"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                    <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                `;
+            } else {
+                // Show default icon
+                navbarProfilePic.style.display = 'none';
+                navbarUserIcon.style.display = 'block';
+                
+                // Guest user
+                userInfo.innerHTML = `
+                    <div class="user-greeting">Welcome!</div>
+                    <div class="user-name">Guest User</div>
+                `;
+                
+                userMenuList.innerHTML = `
+                    <li><a href="{% url 'auth' %}"><i class="fas fa-sign-in-alt"></i> Login / Register</a></li>
+                    <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-bag"></i> My Cart</a></li>
+                    <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                `;
+            }
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear user data
+                localStorage.removeItem('radhi-user');
+                sessionStorage.removeItem('radhi-user');
+                
+                // Clear cart and wishlist
+                localStorage.removeItem('radhi-cart');
+                localStorage.removeItem('radhi-wishlist');
+                
+                // Immediately update counts to 0
+                document.getElementById('cartCount').textContent = '0';
+                document.getElementById('wishlistCount').textContent = '0';
+                
+                alert('✅ Logged out successfully!');
+                
+                // Reload after a short delay to ensure localStorage is cleared
+                setTimeout(() => {
+                    location.reload();
+                }, 100);
+            }
+        }
+        
+        // Quick View Function
+        let currentProduct = null;
+        let currentImageIndex = 0;
+        
+        async function quickView(productId) {
+            try {
+                // Fetch product with variants from API
+                const response = await fetch(`/api/product/${productId}/variants/`);
+                const data = await response.json();
+                
+                if (!data.success) {
+                    alert('Product not found!');
+                    return;
+                }
+                
+                currentProduct = data.product;
+                currentImageIndex = 0;
+                
+                // Create all images array (main + gallery)
+                const allImages = [currentProduct.image, ...currentProduct.gallery_images].filter(img => img);
+                currentProduct.allImages = allImages;
+                
+                // Populate modal with product data
+                const modal = document.getElementById('quickViewModal');
+                if (!modal) return;
+                
+                // Set product image
+                const modalImage = document.getElementById('modalImage');
+                if (modalImage) {
+                    modalImage.src = allImages[0];
+                }
+                
+                // Set thumbnail images
+                const thumb1 = document.getElementById('modalThumb1');
+                const thumb2 = document.getElementById('modalThumb2');
+                const thumb3 = document.getElementById('modalThumb3');
+                
+                if (thumb1) {
+                    thumb1.src = allImages[0] || currentProduct.image;
+                    thumb1.parentElement.style.display = allImages[0] ? 'block' : 'none';
+                }
+                if (thumb2) {
+                    thumb2.src = allImages[1] || '';
+                    thumb2.parentElement.style.display = allImages[1] ? 'block' : 'none';
+                }
+                if (thumb3) {
+                    thumb3.src = allImages[2] || '';
+                    thumb3.parentElement.style.display = allImages[2] ? 'block' : 'none';
+                }
+                
+                // Update image counter
+                const totalImages = allImages.length;
+                document.getElementById('currentImageIndex').textContent = '1';
+                
+                // Update total count in counter
+                const counterElement = document.querySelector('.image-counter');
+                if (counterElement) {
+                    counterElement.innerHTML = `<span id="currentImageIndex">1</span> / ${totalImages}`;
+                }
+                
+                // Set product details
+                document.getElementById('modalCategory').textContent = currentProduct.category_name;
+                document.getElementById('modalTitle').textContent = currentProduct.name;
+                document.getElementById('modalDescription').textContent = currentProduct.description;
+                
+                // Set initial price (will be updated by variant selection)
+                document.getElementById('modalPrice').textContent = `₹${currentProduct.final_price.toFixed(2)}`;
+                
+                if (currentProduct.discount_percentage > 0) {
+                    document.getElementById('modalOldPrice').textContent = `₹${currentProduct.original_price.toFixed(2)}`;
+                    document.getElementById('modalOldPrice').style.display = 'inline';
+                    document.getElementById('modalDiscount').textContent = `${currentProduct.discount_percentage}% OFF`;
+                    document.getElementById('modalDiscount').style.display = 'inline-block';
+                } else {
+                    document.getElementById('modalOldPrice').style.display = 'none';
+                    document.getElementById('modalDiscount').style.display = 'none';
+                }
+                
+                // Don't set initial stock here - it will be set by loadProductVariants
+                // which will use the correct unit_type from the first variant
+                
+                // Load product variants (this will set the correct stock display)
+                loadProductVariants(currentProduct);
+                
+                // Show modal
+                modal.style.display = 'flex';
+                document.getElementById('overlay').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                console.error('Error loading product:', error);
+                alert('Failed to load product details');
+            }
+        }
+        
+        function selectModalImage(index) {
+            if (!currentProduct || !currentProduct.allImages) return;
+            
+            const allImages = currentProduct.allImages;
+            if (index >= allImages.length) return;
+            
+            currentImageIndex = index;
+            
+            // Update main image
+            const modalImage = document.getElementById('modalImage');
+            if (modalImage) {
+                modalImage.src = allImages[index];
+            }
+            
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                if (i === index) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+            
+            // Update counter
+            document.getElementById('currentImageIndex').textContent = (index + 1).toString();
+        }
+        
+        function changeModalImage(direction) {
+            if (!currentProduct || !currentProduct.allImages) return;
+            
+            const allImages = currentProduct.allImages;
+            currentImageIndex += direction;
+            
+            // Loop around
+            if (currentImageIndex >= allImages.length) {
+                currentImageIndex = 0;
+            } else if (currentImageIndex < 0) {
+                currentImageIndex = allImages.length - 1;
+            }
+            
+            selectModalImage(currentImageIndex);
+        }
+        
+        function changeModalQty(change) {
+            const qtySpan = document.getElementById('modalQty');
+            if (!qtySpan) return;
+            
+            let currentQty = parseInt(qtySpan.textContent) || 1;
+            currentQty += change;
+            
+            if (currentQty < 1) currentQty = 1;
+            if (currentProduct && currentProduct.stock && currentQty > currentProduct.stock) {
+                currentQty = currentProduct.stock;
+            }
+            
+            qtySpan.textContent = currentQty;
+        }
+        
+        function addToCartFromModal() {
+            if (!currentProduct) return;
+            
+            // Check if user is logged in
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || localStorage.getItem('radhi-user') || '{}');
+            if (!user.loggedIn) {
+                alert('⚠️ Please login to add items to cart!');
+                window.location.href = '{% url "auth" %}';
+                return;
+            }
+            
+            const qtySpan = document.getElementById('modalQty');
+            const quantity = parseInt(qtySpan.textContent) || 1;
+            
+            // Get selected variant or use product price
+            let price, weight, variantId;
+            if (selectedVariant) {
+                price = selectedVariant.finalPrice || selectedVariant.price;
+                weight = selectedVariant.weight;
+                variantId = selectedVariant.id;
+                
+                // Check stock
+                if (selectedVariant.stock === 0) {
+                    alert('⚠️ This variant is out of stock!');
+                    return;
+                }
+                if (quantity > selectedVariant.stock) {
+                    alert(`⚠️ Only ${selectedVariant.stock} units available!`);
+                    return;
+                }
+            } else {
+                // Fallback to product price
+                price = parseFloat(document.getElementById('modalPrice').textContent.replace('₹', '')) || currentProduct.final_price;
+                weight = '1kg';
+                variantId = null;
+            }
+            
+            // Add to cart
+            let cart = JSON.parse(localStorage.getItem('radhi-cart') || '[]');
+            
+            const existingIndex = cart.findIndex(item => 
+                item.id === currentProduct.id && item.variantId === variantId
+            );
+            
+            if (existingIndex > -1) {
+                const newQty = (cart[existingIndex].quantity || cart[existingIndex].qty || 0) + quantity;
+                if (newQty > 8) {
+                    alert(`⚠️ Maximum 8 items allowed per product!`);
+                    return;
+                }
+                cart[existingIndex].quantity = newQty;
+            } else {
+                cart.push({
+                    id: currentProduct.id,
+                    variantId: variantId,
+                    name: currentProduct.name,
+                    price: price,
+                    weight: weight,
+                    quantity: quantity,
+                    image: currentProduct.image,
+                    category: currentProduct.category_name
+                });
+            }
+            
+            localStorage.setItem('radhi-cart', JSON.stringify(cart));
+            updateCounts();
+            
+            showNotification(`✅ ${currentProduct.name} (${weight}) added to cart!`, 'success');
+            closeQuickView();
+        }
+        
+        // Select variant function
+        function selectVariant(variantId, button) {
+            // Find the selected variant
+            selectedVariant = productVariants.find(v => v.id === variantId);
+            
+            if (!selectedVariant) return;
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.weight-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Add active class to clicked button
+            button.classList.add('active');
+            
+            // Apply product-level discount to variant price
+            const variantOrigPrice = parseFloat(selectedVariant.price);
+            const discPct = currentProduct ? (currentProduct.discount_percentage || 0) : 0;
+            const variantFinalPrice = discPct > 0 ? variantOrigPrice * (1 - discPct/100) : variantOrigPrice;
+            
+            // Update price
+            document.getElementById('modalPrice').textContent = `₹${variantFinalPrice.toFixed(2)}`;
+            
+            // Show original price with strikethrough if discount exists
+            if (discPct > 0) {
+                document.getElementById('modalOldPrice').textContent = `₹${variantOrigPrice.toFixed(2)}`;
+                document.getElementById('modalOldPrice').style.display = 'inline';
+                document.getElementById('modalDiscount').textContent = `${discPct.toFixed(0)}% OFF`;
+                document.getElementById('modalDiscount').style.display = 'inline-block';
+            } else {
+                document.getElementById('modalOldPrice').style.display = 'none';
+                document.getElementById('modalDiscount').style.display = 'none';
+            }
+            
+            // Store selected price for cart
+            selectedVariant.finalPrice = variantFinalPrice;
+            
+            // Update stock info with dynamic unit_type
+            const stockInfo = document.getElementById('modalStockInfo');
+            
+            // Get unit display text based on unit_type
+            function getUnitText(unitType, quantity) {
+                const unitMap = {
+                    'kg': 'kg',
+                    'g': 'g',
+                    'l': quantity === 1 ? 'liter' : 'liters',
+                    'ml': 'ml',
+                    'piece': quantity === 1 ? 'piece' : 'pieces',
+                    'pack': quantity === 1 ? 'pack' : 'packs',
+                    'box': quantity === 1 ? 'box' : 'boxes'
+                };
+                return unitMap[unitType] || 'units';
+            }
+            
+            const unitText = getUnitText(selectedVariant.unit_type, selectedVariant.stock);
+            
+            if (selectedVariant.stock === 0) {
+                stockInfo.innerHTML = '<span style="color: #dc3545;">Out of Stock</span>';
+            } else if (selectedVariant.stock <= selectedVariant.low_stock_alert) {
+                stockInfo.innerHTML = `<span style="color: #ffc107;">Low Stock - ${selectedVariant.stock}${unitText} available</span>`;
+            } else {
+                stockInfo.innerHTML = `<span style="color: #28a745;">${selectedVariant.stock}${unitText} available</span>`;
+            }
+            
+            // Update expiry info
+            const expiryInfo = document.getElementById('modalExpiryInfo');
+            if (selectedVariant.expiry_date) {
+                expiryInfo.innerHTML = `<i class="far fa-calendar-alt"></i> Exp: ${selectedVariant.expiry_date}`;
+            } else {
+                expiryInfo.innerHTML = '';
+            }
+            
+            // Update add to cart button
+            const addBtn = document.querySelector('.modal-add-cart');
+            if (selectedVariant.stock === 0) {
+                addBtn.disabled = true;
+                addBtn.innerHTML = '<i class="fas fa-ban"></i> Out of Stock';
+            } else {
+                addBtn.disabled = false;
+                addBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add to Cart';
+            }
+            
+            // Reset quantity
+            document.getElementById('modalQty').textContent = '1';
+        }
+        
+        // Load product variants function
+        function loadProductVariants(product) {
+            // Store variants data
+            productVariants = product.variants || [];
+            
+            const weightButtonsContainer = document.getElementById('modalWeightButtons');
+            if (!weightButtonsContainer) return;
+            
+            weightButtonsContainer.innerHTML = '';
+            
+            if (productVariants.length === 0) {
+                // No variants, show message or hide section
+                weightButtonsContainer.innerHTML = '<p style="color: #666;">No variants available</p>';
+                return;
+            }
+            
+            // Load variants from database
+            productVariants.forEach((variant, index) => {
+                const button = document.createElement('button');
+                button.className = 'weight-btn' + (index === 0 ? ' active' : '');
+                button.textContent = variant.weight;
+                button.disabled = variant.stock === 0;
+                button.setAttribute('data-variant-id', variant.id);
+                button.onclick = function() {
+                    selectVariant(variant.id, this);
+                };
+                
+                if (variant.stock === 0) {
+                    button.innerHTML = variant.weight + '<br><small style="font-size: 11px;">(Out of Stock)</small>';
+                }
+                
+                weightButtonsContainer.appendChild(button);
+            });
+            
+            // Auto-select first available variant
+            const firstAvailable = productVariants.find(v => v.stock > 0) || productVariants[0];
+            if (firstAvailable) {
+                selectedVariant = firstAvailable;
+                // Find the button for this variant
+                const variantButton = weightButtonsContainer.querySelector(`[data-variant-id="${firstAvailable.id}"]`);
+                if (variantButton) {
+                    // Remove active from all buttons first
+                    weightButtonsContainer.querySelectorAll('.weight-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    // Add active to selected button
+                    variantButton.classList.add('active');
+                    // Call selectVariant to update stock display
+                    selectVariant(firstAvailable.id, variantButton);
+                }
+            }
+        }
+        
+        function toggleWishlist(productId, productName, productPrice, productImage, productCategory, productOffer, productStock) {
+            // Check if user is logged in
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || localStorage.getItem('radhi-user') || '{}');
+            
+            if (!user.loggedIn) {
+                alert('⚠️ Please login to add items to wishlist!');
+                window.location.href = '{% url "auth" %}';
+                return;
+            }
+            
+            let wishlist = JSON.parse(localStorage.getItem('radhi-wishlist') || '[]');
+            const existingIndex = wishlist.findIndex(item => item.id === productId);
+            
+            // Find the heart button for this product
+            const btn = document.querySelector(`.wishlist-btn[onclick*="toggleWishlist(${productId},"]`);
+            const heartIcon = btn ? btn.querySelector('i') : null;
+            
+            if (existingIndex > -1) {
+                // Remove from wishlist
+                wishlist.splice(existingIndex, 1);
+                if (heartIcon) {
+                    heartIcon.className = 'far fa-heart';
+                }
+                if (btn) btn.classList.remove('active');
+                showNotification('Removed from wishlist!', 'info');
+            } else {
+                // Add to wishlist
+                const product = {
+                    id: productId,
+                    name: productName || currentProduct?.name || 'Product',
+                    price: productPrice || currentProduct?.final_price || 0,
+                    image: productImage || currentProduct?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&h=300&fit=crop',
+                    category: productCategory || currentProduct?.category?.name || 'Product',
+                    offer: productOffer || currentProduct?.offer_name || '',
+                    stock: productStock || currentProduct?.stock_quantity || 0
+                };
+                wishlist.push(product);
+                if (heartIcon) {
+                    heartIcon.className = 'fas fa-heart';
+                    heartIcon.style.color = '#ff4757';
+                }
+                if (btn) btn.classList.add('active');
+                showNotification('Added to wishlist!', 'success');
+            }
+            
+            localStorage.setItem('radhi-wishlist', JSON.stringify(wishlist));
+            updateCounts();
+        }
+        
+        function toggleWishlistFromModal() {
+            if (!currentProduct) return;
+            
+            toggleWishlist(currentProduct.id, currentProduct.name, currentProduct.final_price);
+            
+            // Update the heart icon in modal
+            const heartBtn = document.querySelector('#quickViewModal .modal-wishlist i');
+            if (heartBtn) {
+                const wishlist = JSON.parse(localStorage.getItem('radhi-wishlist') || '[]');
+                const isInWishlist = wishlist.some(item => item.id === currentProduct.id);
+                heartBtn.className = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
+            }
+        }
+        
+        function closeQuickView() {
+            const modal = document.getElementById('quickViewModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            const overlay = document.getElementById('overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            document.body.style.overflow = '';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('quickViewModal');
+            if (event.target === modal) {
+                closeQuickView();
+            }
+        }
+        
+        // Update cart and wishlist counts
+        function updateCounts() {
+            try {
+                // Check if user is logged in
+                const user = JSON.parse(sessionStorage.getItem('radhi-user') || '{}');
+                
+                if (!user.loggedIn) {
+                    // Guest user - clear cart/wishlist and show 0
+                    localStorage.removeItem('radhi-cart');
+                    localStorage.removeItem('radhi-wishlist');
+                    document.getElementById('cartCount').textContent = '0';
+                    document.getElementById('wishlistCount').textContent = '0';
+                    return;
+                }
+                
+                // Logged in user - show actual counts
+                const cart = JSON.parse(localStorage.getItem('radhi-cart') || '[]');
+                const wishlist = JSON.parse(localStorage.getItem('radhi-wishlist') || '[]');
+                
+                const cartTotal = cart.reduce((sum, item) => {
+                    const qty = parseInt(item.quantity || item.qty || 0);
+                    return sum + (isNaN(qty) ? 0 : qty);
+                }, 0);
+                
+                document.getElementById('cartCount').textContent = cartTotal;
+                document.getElementById('wishlistCount').textContent = wishlist.length;
+            } catch (e) {
+                console.error('Error updating counts:', e);
+                document.getElementById('cartCount').textContent = '0';
+                document.getElementById('wishlistCount').textContent = '0';
+            }
+        }
+        
+        // Update product price when weight is selected
+        function updateProductPrice(productId, selectElement) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const price = parseFloat(selectedOption.getAttribute('data-price'));
+            const weight = selectedOption.getAttribute('data-weight');
+            
+            // Update price display
+            const priceElement = document.getElementById(`price-${productId}`);
+            if (priceElement) {
+                priceElement.textContent = `₹${price.toFixed(2)}`;
+            }
+            
+            // Store selected variant in data attribute for cart
+            selectElement.setAttribute('data-selected-price', price);
+            selectElement.setAttribute('data-selected-weight', weight);
+        }
+        
+        // Add to cart with selected variant
+        function addToCartWithVariant(productId, productName) {
+            // Check if user is logged in
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || localStorage.getItem('radhi-user') || '{}');
+            if (!user.loggedIn) {
+                alert('⚠️ Please login to add items to cart!');
+                window.location.href = '{% url "auth" %}';
+                return;
+            }
+            
+            // Get selected variant from dropdown
+            const selectElement = document.querySelector(`.weight-select[data-product-id="${productId}"]`);
+            if (!selectElement) {
+                alert('⚠️ Please select a weight/size!');
+                return;
+            }
+            
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const variantId = selectedOption.value;
+            const price = parseFloat(selectedOption.getAttribute('data-price'));
+            const weight = selectedOption.getAttribute('data-weight');
+            
+            // Get product image
+            const productCard = document.querySelector(`[data-id="${productId}"]`);
+            let productImage = '';
+            if (productCard) {
+                const imgElement = productCard.querySelector('.product-image img');
+                if (imgElement) {
+                    productImage = imgElement.src;
+                }
+            }
+            
+            // Add to cart
+            let cart = JSON.parse(localStorage.getItem('radhi-cart') || '[]');
+            
+            const existingIndex = cart.findIndex(item => 
+                item.id === productId && item.variantId === variantId
+            );
+            
+            if (existingIndex > -1) {
+                cart[existingIndex].quantity += 1;
+            } else {
+                cart.push({
+                    id: productId,
+                    variantId: variantId,
+                    name: productName,
+                    price: price,
+                    weight: weight,
+                    quantity: 1,
+                    image: productImage,
+                    category: ''
+                });
+            }
+            
+            localStorage.setItem('radhi-cart', JSON.stringify(cart));
+            updateCounts();
+            
+            showNotification(`✅ ${productName} (${weight}) added to cart!`, 'success');
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            // Simple alert for now - can be enhanced with toast notifications
+            alert(message);
+        }
+        
+        // Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('radhi-theme', 'dark');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('radhi-theme', 'light');
+            }
+        }
+        
+        // Load profile when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize counts to 0 first
+            document.getElementById('cartCount').textContent = '0';
+            document.getElementById('wishlistCount').textContent = '0';
+            
+            loadUserProfile();
+            updateCounts();
+            
+            // Page load pe wishlist items ke hearts fill karo
+            const user = JSON.parse(sessionStorage.getItem('radhi-user') || '{}');
+            if (user.loggedIn) {
+                const savedWishlist = JSON.parse(localStorage.getItem('radhi-wishlist') || '[]');
+                savedWishlist.forEach(item => {
+                    const btn = document.querySelector(`.wishlist-btn[onclick*="toggleWishlist(${item.id},"]`);
+                    if (btn) {
+                        btn.classList.add('active');
+                        const icon = btn.querySelector('i');
+                        if (icon) {
+                            icon.className = 'fas fa-heart';
+                            icon.style.color = '#ff4757';
+                        }
+                    }
+                });
+            }
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('radhi-theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                const icon = document.getElementById('themeIcon');
+                if (icon) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
