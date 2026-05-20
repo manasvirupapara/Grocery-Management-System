@@ -1,0 +1,164 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #a8e6cf, #dcedc1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background: #ffffff;
+    width: 360px;
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h1 {
+    white-space: nowrap;
+    text-align: center;
+    font-size: 28px;
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+.login-container input:focus {
+    outline: none;
+    border-color: #66bb6a;
+    box-shadow: 0 0 5px rgba(102, 187, 106, 0.6);
+}
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    background: #66bb6a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-container button:hover {
+    background: #2e7d32;
+}
+
+.login-container a {
+    display: inline-block;
+    margin-top: 15px;
+    color: #2e7d32;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.login-container a:hover {
+    text-decoration: underline;
+}
+
+/* Password rules styling */
+.login-container ul {
+    list-style: decimal;
+    padding-left: 20px;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.login-container ul li {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    white-space: nowrap;
+    font-size: 28px;
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.title .icon {
+    font-size: 30px;
+}
+
+.title .text {
+    font-weight: bold;
+}
+
+/* PRODUCTS PAGE */
+
+.products-container {
+    width: 90%;
+    margin: 40px auto;
+    background: #f1f8e9;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.products-container h1 {
+    text-align: center;
+    color: #2e7d32;
+    margin-bottom: 25px;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.products-table th {
+    background: #a5d6a7;
+    color: #1b5e20;
+    padding: 12px;
+}
+
+.products-table td {
+    padding: 12px;
+    text-align: center;
+    background: #ffffff;
+}
+
+.products-table tr:nth-child(even) td {
+    background: #e8f5e9;
+}
+
+.status-yes {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.status-no {
+    color: #c62828;
+    font-weight: bold;
+}

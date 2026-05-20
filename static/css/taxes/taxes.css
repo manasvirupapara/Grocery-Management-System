@@ -1,0 +1,36 @@
+:root{
+  --bg: #f4fbf6;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --green-900:#14532d;
+  --green-700:#15803d;
+  --green-100:#dcfce7;
+  --border:#e5e7eb;
+  --shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+  --radius: 14px;
+}
+.tax{ background:var(--bg); padding:18px; min-height: calc(100vh - 40px); }
+.tax__head{ display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+.tax__title{ margin:0; color:var(--green-900); font-size:26px; }
+.tax__sub{ margin:6px 0 0; color:var(--muted); font-size:14px; }
+.card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.cardHead{ padding:14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.tableWrap{ overflow:auto; }
+table{ width:100%; border-collapse:collapse; min-width:700px; }
+thead th{ text-align:left; background:var(--green-100); color:var(--green-900); font-size:12px; padding:12px; border-bottom:1px solid #bbf7d0; }
+tbody td{ padding:12px; border-bottom:1px solid #f1f5f9; font-size:14px; }
+tbody tr:hover{ background:#f7fff9; }
+.badge{ display:inline-flex; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:1px solid transparent; }
+.badge--active{ background:#dcfce7; color:#15803d; border-color:rgba(22,163,74,.20); }
+.badge--inactive{ background:#f1f5f9; color:#475569; border-color:#e2e8f0; }
+.btn{ display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid transparent; cursor:pointer; text-decoration:none; font-weight:900; font-size:14px; }
+.btn--primary{ background:var(--green-700); color:#fff; }
+.btn--ghost{ background:#fff; border-color:var(--border); color:#0f172a; }
+.btn--danger{ background:#fff; border-color: rgba(239,68,68,.35); color:#b91c1c; }
+.btn--sm{ padding:8px 10px; font-size:13px; border-radius:10px; }
+.form{ padding:14px; display:grid; gap:12px; }
+.field label{ font-size:12px; font-weight:800; color:#334155; display:block; margin-bottom:6px; }
+.field input, .field textarea{ width:100%; border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px; outline:none; }
+.actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
