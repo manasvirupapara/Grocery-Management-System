@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}View Customer{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+.view-page {
+    max-width: 1000px;
+}
+.customer-header {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+}
+.customer-header h2 {
+    color: #2e7d32;
+    margin: 0 0 8px 0;
+    font-size: 22px;
+}
+.detail-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+.detail-card h3 {
+    margin: 0 0 20px 0;
+    color: #374151;
+    font-size: 18px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 12px;
+}
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+.detail-item {
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+.detail-item strong {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+.detail-item span {
+    color: #374151;
+    font-size: 14px;
+}
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+.orders-table th {
+    text-align: left;
+    padding: 12px;
+    background: #f9fafb;
+    color: #374151;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid #e5e7eb;
+}
+.orders-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+    color: #374151;
+}
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+.action-buttons a {
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+}
+.btn-primary {
+    background: #2e7d32;
+    color: white;
+}
+.btn-primary:hover {
+    background: #1b5e20;
+}
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page view-page">
+    <div class="customer-header">
+        <h2><i data-lucide="user"></i> {{ customer.name }}</h2>
+    </div>
+
+    <div class="detail-card">
+        <h3><i data-lucide="info"></i> Customer Information</h3>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <strong>Name</strong>
+                <span>{{ customer.name }}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Email</strong>
+                <span>{{ customer.email }}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Phone</strong>
+                <span>{{ customer.phone }}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Location</strong>
+                <span>{{ customer.location }}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Gender</strong>
+                <span>{{ customer.gender }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if orders %}
+    <div class="detail-card">
+        <h3><i data-lucide="shopping-cart"></i> Order History ({{ orders.count }})</h3>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.order_id }}</td>
+                    <td>{{ order.order_date|date:"d M Y" }}</td>
+                    <td>₹ {{ order.calculated_total_amount|floatformat:2 }}</td>
+                    <td>
+                        {% if order.payment_status == 'Success' %}
+                        <span style="background: #e6f4ea; color: #2e7d32; padding: 4px 10px; border-radius: 12px; font-size: 12px;">{{ order.payment_status }}</span>
+                        {% elif order.payment_status == 'Pending' %}
+                        <span style="background: #fff4d8; color: #b8860b; padding: 4px 10px; border-radius: 12px; font-size: 12px;">{{ order.payment_status }}</span>
+                        {% else %}
+                        <span style="background: #fdecea; color: #c62828; padding: 4px 10px; border-radius: 12px; font-size: 12px;">{{ order.payment_status }}</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'order_detail' order.id %}" style="color: #2e7d32; text-decoration: none;">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="action-buttons">
+        <a href="{% url 'edit_customer' customer.id %}" class="btn-primary">Edit Customer</a>
+        <a href="{% url 'customer_list' %}" class="btn-secondary">Back to Customers</a>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}

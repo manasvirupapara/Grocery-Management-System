@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Customers{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page">
+    <div class="page-header">
+        <h2><i data-lucide="users"></i> Customer Management</h2>
+        <a href="{% url 'add_customer' %}" class="btn-track" style="margin-left: auto;">+ Add Customer</a>
+    </div>
+
+    <div class="delivery-filters">
+        <form action="{% url 'customer_list' %}" method="get" class="filter-form">
+            <input type="text" name="search" placeholder="Search by name, email, phone or location..." value="{{ search }}">
+            <select name="gender">
+                <option value="">All</option>
+                <option value="Male" {% if gender_filter == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if gender_filter == 'Female' %}selected{% endif %}>Female</option>
+            </select>
+            <button type="submit" class="btn-track">Search</button>
+        </form>
+    </div>
+
+    <div class="track-order-cards">
+        {% for customer in customers %}
+        <div class="track-card">
+            <div class="track-card-top">
+                <span class="order-id">#{{ customer.id }}</span>
+                <span class="delivery-badge" style="background: #e3f2fd; color: #1565c0;">{{ customer.gender }}</span>
+            </div>
+            <div class="track-card-body">
+                <p><strong>{{ customer.name }}</strong></p>
+                <p class="text-muted">{{ customer.email }}</p>
+                <p>{{ customer.phone }} · {{ customer.location }}</p>
+            </div>
+            <div class="track-card-footer">
+                <a href="{% url 'view_customer' customer.id %}" class="btn-track">View Details</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-orders">
+            <p>No customers found.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if customers.paginator.num_pages > 1 %}
+    <div class="pagination-bar">
+        {% if customers.has_previous %}
+        <a href="?page={{ customers.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}">‹ Prev</a>
+        {% endif %}
+        <span class="page-info">Page {{ customers.number }} of {{ customers.paginator.num_pages }}</span>
+        {% if customers.has_next %}
+        <a href="?page={{ customers.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}">Next ›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}
+

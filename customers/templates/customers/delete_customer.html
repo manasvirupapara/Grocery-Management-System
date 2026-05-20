@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Customer{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delivery.css' %}">
+<style>
+.delete-page {
+    max-width: 500px;
+    margin: 0 auto;
+}
+.delete-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+    text-align: center;
+}
+.delete-card h2 {
+    color: #dc2626;
+    margin: 0 0 16px 0;
+    font-size: 22px;
+}
+.warning-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+.warning-text {
+    color: #374151;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+.warning-text strong {
+    color: #dc2626;
+}
+.warning-sub {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+.customer-info {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+.customer-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #374151;
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+}
+.form-actions button,
+.form-actions a {
+    flex: 1;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+.form-actions button {
+    background: #dc2626;
+    color: white;
+}
+.form-actions button:hover {
+    background: #b91c1c;
+}
+.form-actions a {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+.form-actions a:hover {
+    background: #e5e7eb;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="delivery-page delete-page">
+    <div class="delete-card">
+        <h2><i data-lucide="alert-triangle"></i> Delete Customer</h2>
+        
+        <div class="warning-icon">⚠️</div>
+        
+        <div class="warning-text">
+            Are you sure you want to delete
+            <strong>{{ customer.name }}</strong>?
+        </div>
+        
+        <div class="warning-sub">
+            This action cannot be undone.<br>
+            Deleting this customer will remove all related orders and data.
+        </div>
+
+        <div class="customer-info">
+            <p><strong>Name:</strong> {{ customer.name }}</p>
+            <p><strong>Email:</strong> {{ customer.email }}</p>
+            <p><strong>Phone:</strong> {{ customer.phone }}</p>
+            <p><strong>Location:</strong> {{ customer.location }}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit">Yes, Delete</button>
+                <a href="{% url 'customer_list' %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+
+{% endblock %}
