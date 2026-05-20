@@ -62,7 +62,7 @@ This system helps grocery stores reduce manual work, improve stock handling, and
 
 * Python
 * Django
-* SQLite / MySQL
+* MySQL
 * HTML5
 * CSS3
 * JavaScript
@@ -82,7 +82,7 @@ project/
 ├── static/                  # CSS, JavaScript, images
 ├── media/                   # Uploaded media files
 ├── manage.py
-└── db.sqlite3
+└── MySQL Database
 ```
 
 ---
