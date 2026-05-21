@@ -121,18 +121,6 @@ project/
 
 ---
 
-# 📸 Screenshots
-
-Add project screenshots here:
-
-```md
-![Dashboard](screenshots/dashboard.png)
-![Products](screenshots/products.png)
-![Inventory](screenshots/inventory.png)
-```
-
----
-
 # 🔮 Future Improvements
 
 * Online payment integration
